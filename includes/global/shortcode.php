@@ -207,6 +207,11 @@ class Envira_Gallery_Shortcode_Lite {
                     envira_on_render_<?php echo $data['id']; ?>,
                     envira_holder_<?php echo $data['id']; ?> = $('#envira-gallery-<?php echo $data['id']; ?>').find(".envira-gallery-preload");
 
+                function enviraOnFinished<?php echo $data['id']; ?>(){
+                    envira_container_<?php echo $data['id']; ?>.isotope('reLayout');
+                    envira_container_<?php echo $data['id']; ?>.parent().css('background-image', 'none');
+                }
+
                 envira_container_<?php echo $data['id']; ?>.isotope({
                     transformsEnabled: false,
                     masonry: {
@@ -214,11 +219,11 @@ class Envira_Gallery_Shortcode_Lite {
                         columnWidth: enviraGetColWidth(envira_container_<?php echo $data['id']; ?>, <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>)
                     },
                     onLayout: function( $elems, instance ) {
-                        envira_container_<?php echo $data['id']; ?>.css('overflow', 'visible');
                         envira_container_<?php echo $data['id']; ?>.isotope('reLayout');
+                        envira_container_<?php echo $data['id']; ?>.css('overflow', 'visible');
                         <?php do_action( 'envira_gallery_api_isotope_layout', $data ); ?>
                     }
-                });
+                }, enviraOnFinished<?php echo $data['id']; ?>);
 
                 if ( 0 !== envira_holder_<?php echo $data['id']; ?>.length ) {
                     var envira_mobile = enviraIsMobile(),
@@ -228,9 +233,14 @@ class Envira_Gallery_Shortcode_Lite {
                         if ( typeof envira_src === 'undefined' || false === envira_src ) {
                             return;
                         }
-                        (new Image()).src = envira_src;
+
+                        var envira_image = new Image();
+                        envira_image.src = envira_src;
                         $(this).attr('src', envira_src).removeAttr(envira_src_attr).css('opacity', '1');
                         envira_container_<?php echo $data['id']; ?>.isotope('reLayout');
+                        envira_image.onload = function(){
+                            envira_container_<?php echo $data['id']; ?>.isotope('reLayout');
+                        };
 
                         // If loading in the last image, don't throttle the reLayout method - just do it.
                         if ( (i + 1) === envira_holder_<?php echo $data['id']; ?>.length ) {
@@ -256,7 +266,7 @@ class Envira_Gallery_Shortcode_Lite {
                             <?php do_action( 'envira_gallery_api_isotope_layout', $data ); ?>
                         }
                     });
-                });
+                }, enviraOnFinished<?php echo $data['id']; ?>);
 
                 <?php do_action( 'envira_gallery_api_isotope', $data ); ?>
 

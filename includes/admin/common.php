@@ -85,9 +85,6 @@ class Envira_Gallery_Common_Admin_Lite {
         // Force the menu icon to be scaled to proper size (for Retina displays).
         add_action( 'admin_head', array( $this, 'menu_icon' ) );
 
-        // Run limit checks.
-        $this->limit();
-
     }
 
     /**
@@ -287,6 +284,9 @@ class Envira_Gallery_Common_Admin_Lite {
 
         $gallery = get_post( $id );
 
+        // Update the checker limit.
+        $this->update_limit( $id, true );
+
         // Flush necessary gallery caches to ensure trashed galleries are not showing.
         Envira_Gallery_Common_Lite::get_instance()->flush_gallery_caches( $id );
 
@@ -315,6 +315,9 @@ class Envira_Gallery_Common_Admin_Lite {
     public function untrash_gallery( $id ) {
 
         $gallery = get_post( $id );
+
+        // Update the checker limit.
+        $this->update_limit( $id );
 
         // Flush necessary gallery caches to ensure untrashed galleries are showing.
         Envira_Gallery_Common_Lite::get_instance()->flush_gallery_caches( $id );
@@ -356,14 +359,45 @@ class Envira_Gallery_Common_Admin_Lite {
      */
     public function limit() {
 
-        // Get the limit option.
-        $option = (int) get_option( 'envira_gallery_lite_limit' );
-
         // Update with the number of galleries created.
         $galleries = $this->base->get_galleries();
         $this->base->number = count( $galleries );
         if ( $this->base->number >= 5 )
             $this->base->limit = true;
+
+    }
+
+    /**
+     * Updates the limit checker on save, trash, deletion and other change events.
+     *
+     * @since 1.0.0
+     *
+     * @param int $post_id The current post ID.
+     * @param bool $unset  Whether or not to unset the ID from the limit checker.
+     * @return null        Return early if no gallery is available for the ID.
+     */
+    public function update_limit( $post_id, $unset = false ) {
+
+        // Return early if no gallery exists for the ID provided.
+        if ( ! $this->base->get_gallery( $post_id ) )
+            return;
+
+        // Get the limit option.
+        $limit = get_option( 'envira_gallery_lite_limit' );
+
+        // If unsetting, unset and return.
+        if ( $unset ) {
+            if ( ( $key = array_search( $post_id, (array) $limit ) ) !== false )
+                unset( $limit[$key] );
+
+            update_option( 'envira_gallery_lite_limit', $limit );
+        } else {
+            if ( count( $limit ) >= 5 || in_array( $post_id, (array) $limit ) )
+                return;
+
+            $limit[] = $post_id;
+            update_option( 'envira_gallery_lite_limit', $limit );
+        }
 
     }
 

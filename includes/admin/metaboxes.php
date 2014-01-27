@@ -247,6 +247,9 @@ class Envira_Gallery_Metaboxes_Lite {
         // Keep security first.
         wp_nonce_field( 'envira-gallery', 'envira-gallery' );
 
+        // Run limit checks.
+        Envira_Gallery_Common_Admin_Lite::get_instance()->limit();
+
         // If no more galleries can be made, return early.
         if ( $this->base->limit ) {
             if ( in_array( $post->ID, get_option( 'envira_gallery_lite_limit' ) ) )
@@ -797,6 +800,9 @@ class Envira_Gallery_Metaboxes_Lite {
 
         // Finally, flush all gallery caches to ensure everything is up to date.
         $this->flush_gallery_caches( $post_id, $settings['config']['slug'] );
+
+        // Update the limit checker.
+        Envira_Gallery_Common_Admin_Lite::get_instance()->update_limit( $post_id );
 
     }
 

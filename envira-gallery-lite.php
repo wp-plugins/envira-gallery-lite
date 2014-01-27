@@ -358,7 +358,7 @@ class Envira_Gallery_Lite {
         $number = 5 - (int) $this->number;
         ?>
         <div class="updated below-h2">
-            <p><?php printf( __( 'You have <strong>%s galleries</strong> remaining to be created in the lite version before you have reached your limit. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), $number, 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
+            <p><?php printf( __( 'You have <strong>%s galleries</strong> remaining to be created in the lite version before you have reached your limit. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), (int) $number, 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
         </div>
         <?php
 
@@ -368,6 +368,8 @@ class Envira_Gallery_Lite {
      * Helper method to encourage users to upgrade once their gallery limit is reached.
      *
      * @since 1.0.0
+     *
+     * @param bool $can_edit Flag if the user can still edit the gallery.
      */
     public function upgrade( $can_edit = false ) {
 

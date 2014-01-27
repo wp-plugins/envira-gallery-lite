@@ -840,7 +840,7 @@ class Envira_Gallery_Metaboxes_Lite {
                             </form>
                         </td>
                     </tr>
-                    <?php do_action( 'envira_tab_misc_box', $post ); ?>
+                    <?php do_action( 'envira_gallery_misc_box', $post ); ?>
                 </tbody>
             </table>
         </div>

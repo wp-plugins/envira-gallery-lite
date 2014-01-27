@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: Envira Gallery Lite
- * Plugin URI: http://enviragallery.com
+ * Plugin URI:  http://enviragallery.com
  * Description: Envira Gallery is best responsive WordPress gallery plugin. This is the lite version.
- * Author: Thomas Griffin
- * Author URI: http://thomasgriffinmedia.com
- * Version: 1.0.0
+ * Author:      Thomas Griffin
+ * Author URI:  http://thomasgriffinmedia.com
+ * Version:     1.0.0
  * Text Domain: envira-gallery
  * Domain Path: languages
  *
@@ -24,7 +24,9 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 /**
  * Main plugin class.
@@ -134,7 +136,9 @@ class Envira_Gallery_Lite {
     public function load_plugin_textdomain() {
 
         // Do nothing if the full version of Envira Gallery is already active.
-        if ( class_exists( 'Envira_Gallery' ) ) return;
+        if ( class_exists( 'Envira_Gallery' ) ) {
+            return;
+        }
 
         $domain = $this->domain;
         $locale = apply_filters( 'plugin_locale', get_locale(), $domain );
@@ -152,17 +156,20 @@ class Envira_Gallery_Lite {
     public function init() {
 
         // Do nothing if the full version of Envira Gallery is already active.
-        if ( class_exists( 'Envira_Gallery' ) ) return;
+        if ( class_exists( 'Envira_Gallery' ) ) {
+            return;
+        }
+
+        // Run hook once Envira has been initialized.
+        do_action( 'envira_gallery_init' );
 
         // Load admin only components.
-        if ( is_admin() )
+        if ( is_admin() ) {
             $this->require_admin();
+        }
 
         // Load global components.
         $this->require_global();
-
-        // Run hook once all actions and filters have been setup.
-        do_action( 'envira_gallery_init' );
 
     }
 
@@ -173,10 +180,11 @@ class Envira_Gallery_Lite {
      */
     public function require_admin() {
 
-        require_once plugin_dir_path( __FILE__ ) . 'includes/admin/ajax.php';
-        require_once plugin_dir_path( __FILE__ ) . 'includes/admin/common.php';
-        require_once plugin_dir_path( __FILE__ ) . 'includes/admin/editor.php';
-        require_once plugin_dir_path( __FILE__ ) . 'includes/admin/metaboxes.php';
+        require plugin_dir_path( __FILE__ ) . 'includes/admin/ajax.php';
+        require plugin_dir_path( __FILE__ ) . 'includes/admin/common.php';
+        require plugin_dir_path( __FILE__ ) . 'includes/admin/editor.php';
+        require plugin_dir_path( __FILE__ ) . 'includes/admin/metaboxes.php';
+        require plugin_dir_path( __FILE__ ) . 'includes/admin/posttype.php';
 
     }
 
@@ -187,9 +195,9 @@ class Envira_Gallery_Lite {
      */
     public function require_global() {
 
-        require_once plugin_dir_path( __FILE__ ) . 'includes/global/common.php';
-        require_once plugin_dir_path( __FILE__ ) . 'includes/global/posttype.php';
-        require_once plugin_dir_path( __FILE__ ) . 'includes/global/shortcode.php';
+        require plugin_dir_path( __FILE__ ) . 'includes/global/common.php';
+        require plugin_dir_path( __FILE__ ) . 'includes/global/posttype.php';
+        require plugin_dir_path( __FILE__ ) . 'includes/global/shortcode.php';
 
     }
 
@@ -206,8 +214,9 @@ class Envira_Gallery_Lite {
         // Attempt to return the transient first, otherwise generate the new query to retrieve the data.
         if ( false === ( $gallery = get_transient( '_eg_cache_' . $id ) ) ) {
             $gallery = $this->_get_gallery( $id );
-            if ( $gallery )
-                set_transient( '_eg_cache_' . $id, $gallery, apply_filters( 'envira_gallery_cache_time', DAY_IN_SECONDS ) );
+            if ( $gallery ) {
+                set_transient( '_eg_cache_' . $id, $gallery, DAY_IN_SECONDS );
+            }
         }
 
         // Return the gallery data.
@@ -216,20 +225,21 @@ class Envira_Gallery_Lite {
     }
 
     /**
-     * Private internal method that returns a gallery based on ID.
+     * Internal method that returns a gallery based on ID.
      *
      * @since 1.0.0
      *
      * @param int $id     The gallery ID used to retrieve a gallery.
      * @return array|bool Array of gallery data or false if none found.
      */
-    private function _get_gallery( $id ) {
+    public function _get_gallery( $id ) {
 
         $gallery = get_post_meta( $id, '_eg_gallery_data', true );
-        if ( empty( $gallery ) || empty( $gallery['gallery'] ) )
+        if ( empty( $gallery ) || empty( $gallery['gallery'] ) ) {
             return false;
-        else
+        } else {
             return $gallery;
+        }
 
     }
 
@@ -246,8 +256,9 @@ class Envira_Gallery_Lite {
         // Attempt to return the transient first, otherwise generate the new query to retrieve the data.
         if ( false === ( $gallery = get_transient( '_eg_cache_' . $slug ) ) ) {
             $gallery = $this->_get_gallery_by_slug( $slug );
-            if ( $gallery )
-                set_transient( '_eg_cache_' . $slug, $gallery, apply_filters( 'envira_gallery_cache_time', DAY_IN_SECONDS ) );
+            if ( $gallery ) {
+                set_transient( '_eg_cache_' . $slug, $gallery, DAY_IN_SECONDS );
+            }
         }
 
         // Return the gallery data.
@@ -256,20 +267,21 @@ class Envira_Gallery_Lite {
     }
 
     /**
-     * Private internal method that returns a gallery based on slug.
+     * Internal method that returns a gallery based on slug.
      *
      * @since 1.0.0
      *
      * @param string $slug The gallery slug used to retrieve a gallery.
      * @return array|bool  Array of gallery data or false if none found.
      */
-    private function _get_gallery_by_slug( $slug ) {
+    public function _get_gallery_by_slug( $slug ) {
 
         $galleries = get_posts(
             array(
                 'post_type'     => 'any',
-                'post_status'   => 'publish',
                 'no_found_rows' => true,
+                'cache_results' => false,
+                'nopaging'      => true,
                 'fields'        => 'ids',
                 'meta_query'    => array(
                     array(
@@ -280,10 +292,11 @@ class Envira_Gallery_Lite {
                 )
             )
         );
-        if ( empty( $galleries ) )
+        if ( empty( $galleries ) ) {
             return false;
-        else
+        } else {
             return get_post_meta( $galleries[0], '_eg_gallery_data', true );
+        }
 
     }
 
@@ -299,8 +312,9 @@ class Envira_Gallery_Lite {
         // Attempt to return the transient first, otherwise generate the new query to retrieve the data.
         if ( false === ( $galleries = get_transient( '_eg_cache_all' ) ) ) {
             $galleries = $this->_get_galleries();
-            if ( $galleries )
-                set_transient( '_eg_cache_all', $galleries, apply_filters( 'envira_gallery_cache_time', DAY_IN_SECONDS ) );
+            if ( $galleries ) {
+                set_transient( '_eg_cache_all', $galleries, DAY_IN_SECONDS );
+            }
         }
 
         // Return the gallery data.
@@ -309,19 +323,20 @@ class Envira_Gallery_Lite {
     }
 
     /**
-     * Private internal method that returns all galleries created on the site.
+     * Internal method that returns all galleries created on the site.
      *
      * @since 1.0.0
      *
      * @return array|bool Array of gallery data or false if none found.
      */
-    private function _get_galleries() {
+    public function _get_galleries() {
 
         $galleries = get_posts(
             array(
                 'post_type'     => 'any',
-                'post_status'   => 'publish',
                 'no_found_rows' => true,
+                'cache_results' => false,
+                'nopaging'      => true,
                 'fields'        => 'ids',
                 'meta_query'    => array(
                     array(
@@ -330,20 +345,22 @@ class Envira_Gallery_Lite {
                 )
             )
         );
-        if ( empty( $galleries ) )
+        if ( empty( $galleries ) ) {
             return false;
+        }
 
         // Now loop through all the galleries found and only use galleries that have images in them.
         $ret = array();
         foreach ( $galleries as $id ) {
             $data = get_post_meta( $id, '_eg_gallery_data', true );
-            if ( empty( $data['gallery'] ) )
+            if ( empty( $data['gallery'] ) ) {
                 continue;
+            }
 
             $ret[] = $data;
         }
 
-        // Return the results.
+        // Return the gallery data.
         return $ret;
 
     }
@@ -358,7 +375,7 @@ class Envira_Gallery_Lite {
         $number = 5 - (int) $this->number;
         ?>
         <div class="updated below-h2">
-            <p><?php printf( __( 'You have <strong>%s galleries</strong> remaining to be created in the Lite version before you have reached your limit. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), (int) $number, 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
+            <p><?php printf( __( 'You have <strong>%s</strong> remaining to be created in the Lite version before you have reached your limit. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the premium version.</a>', 'envira-gallery' ), sprintf( _n( '1 gallery', '%s galleries', (int) $number, 'envira-gallery' ), (int) $number ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
         </div>
         <?php
 
@@ -376,9 +393,9 @@ class Envira_Gallery_Lite {
         ?>
         <div class="error below-h2">
             <?php if ( $can_edit ) : ?>
-            <p><?php printf( __( 'You have reached your limit of <strong>5 galleries</strong> for the Lite version of Envira Gallery. <strong>You can still use this existing gallery.</strong> To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
+            <p><?php printf( __( 'You have reached your limit of <strong>5 galleries</strong> for the Lite version of Envira Gallery. <strong>You can still use this existing gallery.</strong> To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the premium version.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
             <?php else : ?>
-            <p><?php printf( __( 'You have reached your limit of <strong>5 galleries</strong> for the Lite version of Envira Gallery. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
+            <p><?php printf( __( 'You have reached your limit of <strong>5 galleries</strong> for the Lite version of Envira Gallery. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the premium version.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
             <?php endif; ?>
         </div>
         <?php
@@ -394,8 +411,9 @@ class Envira_Gallery_Lite {
      */
     public static function get_instance() {
 
-        if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Envira_Gallery_Lite ) )
+        if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Envira_Gallery_Lite ) ) {
             self::$instance = new Envira_Gallery_Lite();
+        }
 
         return self::$instance;
 
@@ -417,24 +435,28 @@ function envira_gallery_lite_activation_hook( $network_wide ) {
     global $wp_version;
     if ( version_compare( $wp_version, '3.8', '<' ) ) {
         deactivate_plugins( plugin_basename( __FILE__ ) );
-        wp_die( 'Sorry, but your version of WordPress does not meet Envira Gallery\'s required version of <strong>3.8</strong> to run properly. The plugin has been deactivated. <a href="' . get_admin_url() . '">Click here to return to the Dashboard</a>.' );
+        wp_die( sprintf( __( 'Sorry, but your version of WordPress does not meet Envira Gallery\'s required version of <strong>3.8</strong> to run properly. The plugin has been deactivated. <a href="%s">Click here to return to the Dashboard</a>.', 'envira-gallery' ), get_admin_url() ) );
     }
 
-    if ( is_multisite() ) :
+    if ( is_multisite() && $network_wide ) {
         global $wpdb;
         $site_list = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->blogs ORDER BY blog_id" ) );
-        foreach ( (array) $site_list as $site ) :
+        foreach ( (array) $site_list as $site ) {
             switch_to_blog( $site->blog_id );
+
             $option = get_option( 'envira_gallery_lite_limit' );
-            if ( ! $option || empty( $option ) )
+            if ( ! $option || empty( $option ) ) {
                 update_option( 'envira_gallery_lite_limit', array() );
+            }
+
             restore_current_blog();
-        endforeach;
-    else :
+        }
+    } else {
         $option = get_option( 'envira_gallery_lite_limit' );
-        if ( ! $option || empty( $option ) )
+        if ( ! $option || empty( $option ) ) {
             update_option( 'envira_gallery_lite_limit', array() );
-    endif;
+        }
+    }
 
 }
 
@@ -444,21 +466,21 @@ register_uninstall_hook(  __FILE__, 'envira_gallery_lite_uninstall_hook'  );
  *
  * @since 1.0.0
  *
- * @param boolean $network_wide True if WPMU superadmin uses "Network Deactivate" action, false otherwise.
+ * @global object $wpdb The WordPress database object.
  */
-function envira_gallery_lite_uninstall_hook( $network_wide ) {
+function envira_gallery_lite_uninstall_hook() {
 
-    if ( is_multisite() ) :
+    if ( is_multisite() ) {
         global $wpdb;
-        $site_list = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->blogs ORDER BY blog_id" ) );
-        foreach ( (array) $site_list as $site ) :
+        $site_list = $wpdb->get_results( "SELECT * FROM $wpdb->blogs ORDER BY blog_id" );
+        foreach ( (array) $site_list as $site ) {
             switch_to_blog( $site->blog_id );
             delete_option( 'envira_gallery_lite_limit' );
             restore_current_blog();
-        endforeach;
-    else :
+        }
+    } else {
         delete_option( 'envira_gallery_lite_limit' );
-    endif;
+    }
 
 }
 
@@ -466,23 +488,24 @@ function envira_gallery_lite_uninstall_hook( $network_wide ) {
 $envira_gallery_lite = Envira_Gallery_Lite::get_instance();
 
 // Conditionally load the template tag.
-if ( ! function_exists( 'envira_gallery' ) ) :
-/**
- * Primary template tag for outputting Envira galleries in templates.
- *
- * @since 1.0.0
- *
- * @param int $gallery_id The ID of the gallery to load.
- * @param string $type    The type of field to query. 'id' or 'slug'.
- * @param bool $return    Flag to echo or return the gallery HTML.
- */
-function envira_gallery( $id, $type = 'id', $return = false ) {
+if ( ! function_exists( 'envira_gallery' ) ) {
+    /**
+     * Primary template tag for outputting Envira galleries in templates.
+     *
+     * @since 1.0.0
+     *
+     * @param int $gallery_id The ID of the gallery to load.
+     * @param string $type    The type of field to query.
+     * @param bool $return    Flag to echo or return the gallery HTML.
+     */
+    function envira_gallery( $id, $type = 'id', $return = false ) {
 
-    $shortcode = '[envira-gallery ' . $type . '="' . $id . '"]';
-    if ( $return )
-        return do_shortcode( $shortcode );
-    else
-        echo do_shortcode( $shortcode );
+        $shortcode = '[envira-gallery ' . $type . '="' . $id . '"]';
+        if ( $return ) {
+            return do_shortcode( $shortcode );
+        } else {
+            echo do_shortcode( $shortcode );
+        }
 
+    }
 }
-endif;

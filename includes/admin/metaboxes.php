@@ -74,8 +74,9 @@ class Envira_Gallery_Metaboxes_Lite {
      */
     public function meta_box_styles() {
 
-        if ( 'post' !== get_current_screen()->base )
+        if ( 'post' !== get_current_screen()->base ) {
             return;
+        }
 
         // Load necessary metabox styles.
         wp_register_style( $this->base->plugin_slug . '-metabox-style', plugins_url( 'assets/css/metabox.css', $this->base->file ), array(), $this->base->version );
@@ -96,20 +97,20 @@ class Envira_Gallery_Metaboxes_Lite {
 
         global $id, $post;
 
-        if ( isset( get_current_screen()->base ) && 'post' !== get_current_screen()->base )
+        if ( isset( get_current_screen()->base ) && 'post' !== get_current_screen()->base ) {
             return;
+        }
 
         // Set the post_id for localization.
         $post_id = ( null === $id ) ? $post->ID : $id;
 
         // Load WordPress necessary scripts.
         wp_enqueue_script( 'plupload-handlers' );
-        wp_enqueue_script( 'jquery-ui-tabs' );
         wp_enqueue_script( 'jquery-ui-sortable' );
         wp_enqueue_media( array( 'post' => $post_id ) );
 
         // Load necessary metabox scripts.
-        wp_register_script( $this->base->plugin_slug . '-metabox-script', plugins_url( 'assets/js/metabox.js', $this->base->file ), array( 'jquery', 'plupload-handlers', 'jquery-ui-tabs', 'jquery-ui-sortable' ), $this->base->version, true );
+        wp_register_script( $this->base->plugin_slug . '-metabox-script', plugins_url( 'assets/js/metabox.js', $this->base->file ), array( 'jquery', 'plupload-handlers', 'quicktags', 'jquery-ui-sortable' ), $this->base->version, true );
         wp_enqueue_script( $this->base->plugin_slug . '-metabox-script' );
         wp_localize_script(
             $this->base->plugin_slug . '-metabox-script',
@@ -118,7 +119,6 @@ class Envira_Gallery_Metaboxes_Lite {
                 'ajax'           => admin_url( 'admin-ajax.php' ),
                 'gallery'        => esc_attr__( 'Click here to use images from your media library.', 'envira-gallery' ),
                 'id'             => $post_id,
-                'import'         => __( 'You must select a file to import before continuing.', 'envira-gallery' ),
                 'insert_nonce'   => wp_create_nonce( 'envira-gallery-insert-images' ),
                 'inserting'      => __( 'Inserting...', 'envira-gallery' ),
                 'library_search' => wp_create_nonce( 'envira-gallery-library-search' ),
@@ -136,8 +136,9 @@ class Envira_Gallery_Metaboxes_Lite {
         );
 
         // If on an Envira post type, add custom CSS for hiding specific things.
-        if ( isset( get_current_screen()->post_type ) && 'envira' == get_current_screen()->post_type )
+        if ( isset( get_current_screen()->post_type ) && 'envira' == get_current_screen()->post_type ) {
             add_action( 'admin_head', array( $this, 'meta_box_css' ) );
+        }
 
     }
 
@@ -173,10 +174,11 @@ class Envira_Gallery_Metaboxes_Lite {
         // Loops through the post types and add the metaboxes.
         foreach ( (array) $post_types as $post_type ) {
             // Don't output boxes on these post types.
-            if ( in_array( $post_type, array( 'attachment', 'revision', 'nav_menu_item', 'soliloquy' ) ) )
+            if ( in_array( $post_type, apply_filters( 'envira_gallery_skipped_posttypes', array( 'attachment', 'revision', 'nav_menu_item', 'soliloquy' ) ) ) ) {
                 continue;
+            }
 
-            add_meta_box( 'envira-gallery', __( 'Envira Gallery Settings', 'envira-gallery' ), array( $this, 'meta_box_callback' ), $post_type, 'normal', 'high' );
+            add_meta_box( 'envira-gallery', __( 'Envira Gallery Settings', 'envira-gallery' ), array( $this, 'meta_box_callback' ), $post_type, 'advanced', 'high' );
         }
 
     }
@@ -219,8 +221,9 @@ class Envira_Gallery_Metaboxes_Lite {
 
                         // Otherwise, loop through the pass_over IDs and if we have a match, continue.
                         foreach ( $pass_over as $to_pass ) {
-                            if ( preg_match( '#^' . $id . '#i', $to_pass ) )
+                            if ( preg_match( '#^' . $id . '#i', $to_pass ) ) {
                                 continue;
+                            }
                         }
 
                         // If we reach this point, remove the metabox completely.
@@ -249,26 +252,36 @@ class Envira_Gallery_Metaboxes_Lite {
 
         // If no more galleries can be made, return early.
         if ( $this->base->limit ) {
-            if ( in_array( $post->ID, get_option( 'envira_gallery_lite_limit' ) ) )
+            if ( in_array( $post->ID, get_option( 'envira_gallery_lite_limit' ) ) ) {
                 $this->base->upgrade( true );
-            else
+            } else {
                 return $this->base->upgrade();
+            }
         } else {
             $this->base->remaining();
         }
 
+        // Check for our meta overlay helper.
+        $gallery_data = get_post_meta( $post->ID, '_eg_gallery_data', true );
+        $helper       = get_post_meta( $post->ID, '_eg_just_published', true );
+        $class        = '';
+        if ( $helper ) {
+            $class = 'envira-helper-needed';
+        }
+
         ?>
-        <div id="envira-tabs" class="envira-clear">
+        <div id="envira-tabs" class="envira-clear <?php echo $class; ?>">
+            <?php $this->meta_helper( $post, $gallery_data ); ?>
             <ul id="envira-tabs-nav" class="envira-clear">
-                <?php foreach ( (array) $this->get_envira_tab_nav() as $id => $title ) : ?>
-                    <li><a href="#envira-tab-<?php echo $id; ?>" title="<?php echo $title; ?>"><?php echo $title; ?></a></li>
-                <?php endforeach; ?>
+                <?php $i = 0; foreach ( (array) $this->get_envira_tab_nav() as $id => $title ) : $class = 0 === $i ? 'envira-active' : ''; ?>
+                    <li class="<?php echo $class; ?>"><a href="#envira-tab-<?php echo $id; ?>" title="<?php echo $title; ?>"><?php echo $title; ?></a></li>
+                <?php $i++; endforeach; ?>
             </ul>
-            <?php foreach ( (array) $this->get_envira_tab_nav() as $id => $title ) : ?>
-                <div id="envira-tab-<?php echo $id; ?>" class="envira-tab envira-clear">
+            <?php $i = 0; foreach ( (array) $this->get_envira_tab_nav() as $id => $title ) : $class = 0 === $i ? 'envira-active' : ''; ?>
+                <div id="envira-tab-<?php echo $id; ?>" class="envira-tab envira-clear <?php echo $class; ?>">
                     <?php do_action( 'envira_gallery_tab_' . $id, $post ); ?>
                 </div>
-            <?php endforeach; ?>
+            <?php $i++; endforeach; ?>
         </div>
         <?php
 
@@ -307,8 +320,16 @@ class Envira_Gallery_Metaboxes_Lite {
      */
     public function images_tab( $post ) {
 
+        // Run a filter to contextualize the upload message.
+        add_filter( 'gettext', array( $this, 'upload_context' ), 1, 3 );
+
         $gallery_data = get_post_meta( $post->ID, '_eg_gallery_data', true );
-        media_upload_form(); ?>
+        media_upload_form();
+
+        // Remove the contextual filter.
+        remove_filter( 'gettext', array( $this, 'upload_context' ), 1, 3 );
+
+        ?>
         <script type="text/javascript">var post_id = <?php echo $post->ID; ?>, shortform = 3;</script>
         <input type="hidden" name="post_id" id="post_id" value="<?php echo $post->ID; ?>" />
         <div id="media-items" class="hide-if-no-js media-upload-form" style="display:none;"></div>
@@ -319,7 +340,75 @@ class Envira_Gallery_Metaboxes_Lite {
                 <?php endforeach; ?>
             <?php endif; ?>
         </ul>
-        <?php $this->media_library();
+        <?php $this->media_library( $post );
+
+    }
+
+    /**
+     * Filter the media drag/drop upload text for better contextualization.
+     *
+     * @since 1.0.0
+     *
+     * @param string $translated_text  The translated text string.
+     * @param string $source_text      The source text string (not yet translated).
+     * @param string $domain           The textdomain for the text string.
+     * @return string $translated_text Amended translated text.
+     */
+    public function upload_context( $translated_text, $source_text, $domain ) {
+
+        if ( 'Drop files here' === $source_text ) {
+            return __( 'Drop images here', 'envira-gallery' );
+        }
+
+        if ( 'Select Files' === $source_text ) {
+            return __( 'Select Images', 'envira-gallery' );
+        }
+
+        return $translated_text;
+
+    }
+
+    /**
+     * Inserts the meta icon for displaying useful gallery meta like shortcode and template tag.
+     *
+     * @since 1.0.0
+     *
+     * @param object $post        The current post object.
+     * @param array $gallery_data Array of gallery data for the current post.
+     * @return null               Return early if this is an auto-draft.
+     */
+    public function meta_helper( $post, $gallery_data ) {
+
+        if ( isset( $post->post_status ) && 'auto-draft' == $post->post_status ) {
+            return;
+        }
+
+        // Check for our meta overlay helper.
+        $helper = get_post_meta( $post->ID, '_eg_just_published', true );
+        $class  = '';
+        if ( $helper ) {
+            $class = 'envira-helper-active';
+            delete_post_meta( $post->ID, '_eg_just_published' );
+        }
+
+        ?>
+        <div class="envira-meta-helper <?php echo $class; ?>">
+            <span class="envira-meta-close-text"><?php _e( '(click the icon to open and close the overlay dialog)', 'envira-gallery' ); ?></span>
+            <a href="#" class="envira-meta-icon" title="<?php esc_attr__( 'Click here to view meta information about this gallery.', 'envira-gallery' ); ?>"></a>
+            <div class="envira-meta-information">
+                <p><?php _e( 'You can place this gallery anywhere into your posts, pages, custom post types or widgets by using the shortcode(s) below:', 'envira-gallery' ); ?></p>
+                <code><?php echo '[envira-gallery id="' . $post->ID . '"]'; ?></code>
+                <?php if ( ! empty( $gallery_data['config']['slug'] ) ) : ?>
+                    <br><code><?php echo '[envira-gallery slug="' . $gallery_data['config']['slug'] . '"]'; ?></code>
+                <?php endif; ?>
+                <p><?php _e( 'You can also place this gallery into your template files by using the template tag(s) below:', 'envira-gallery' ); ?></p>
+                <code><?php echo 'if ( function_exists( \'envira_gallery\' ) ) { envira_gallery( \'' . $post->ID . '\' ); }'; ?></code>
+                <?php if ( ! empty( $gallery_data['config']['slug'] ) ) : ?>
+                    <br><code><?php echo 'if ( function_exists( \'envira_gallery\' ) ) { envira_gallery( \'' . $gallery_data['config']['slug'] . '\', \'slug\' ); }'; ?></code>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php
 
     }
 
@@ -330,9 +419,8 @@ class Envira_Gallery_Metaboxes_Lite {
      *
      * @param object $post The current post object.
      */
-    public function media_library() {
+    public function media_library( $post ) {
 
-        global $post;
         ?>
         <div id="envira-gallery-upload-ui-wrapper">
             <div id="envira-gallery-upload-ui" class="envira-gallery-image-meta" style="display: none;">
@@ -346,6 +434,7 @@ class Envira_Gallery_Metaboxes_Lite {
                             <div class="media-frame-router">
                                 <div class="media-router">
                                     <a href="#" class="media-menu-item active"><?php _e( 'Images', 'envira-gallery' ); ?></a>
+                                    <?php do_action( 'envira_gallery_modal_router', $post ); ?>
                                 </div><!-- end .media-router -->
                             </div><!-- end .media-frame-router -->
                             <!-- begin content for inserting slides from media library -->
@@ -734,7 +823,8 @@ class Envira_Gallery_Metaboxes_Lite {
                         </th>
                         <td>
                             <form></form>
-                            <form action="<?php echo add_query_arg( 'envira-gallery-imported', true ); ?>" id="envira-config-import-gallery-form" class="envira-gallery-import-form" method="post" enctype="multipart/form-data">
+                            <?php $import_url = 'auto-draft' == $post->post_status ? add_query_arg( array( 'post' => $post->ID, 'action' => 'edit', 'envira-gallery-imported' => true ), admin_url( 'post.php' ) ) : add_query_arg( 'envira-gallery-imported', true ); ?>
+                            <form action="<?php echo $import_url; ?>" id="envira-config-import-gallery-form" class="envira-gallery-import-form" method="post" enctype="multipart/form-data">
                                 <input id="envira-config-import-gallery" type="file" name="envira_import_gallery" />
                                 <input type="hidden" name="envira_import" value="1" />
                                 <input type="hidden" name="envira_post_id" value="<?php echo $post->ID; ?>" />
@@ -769,50 +859,68 @@ class Envira_Gallery_Metaboxes_Lite {
     public function save_meta_boxes( $post_id, $post ) {
 
         // Bail out if we fail a security check.
-        if ( ! isset( $_POST['envira-gallery'] ) || ! wp_verify_nonce( $_POST['envira-gallery'], 'envira-gallery' ) || ! isset( $_POST['_envira_gallery'] ) )
+        if ( ! isset( $_POST['envira-gallery'] ) || ! wp_verify_nonce( $_POST['envira-gallery'], 'envira-gallery' ) || ! isset( $_POST['_envira_gallery'] ) ) {
             return;
+        }
 
         // Bail out if running an autosave, ajax, cron or revision.
-        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
+        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
             return;
-        if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
+        }
+
+        if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
             return;
-        if ( defined( 'DOING_CRON' ) && DOING_CRON )
+        }
+
+        if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
             return;
-        if ( wp_is_post_revision( $post_id ) )
+        }
+
+        if ( wp_is_post_revision( $post_id ) ) {
             return;
+        }
 
         // Bail out if the user doesn't have the correct permissions to update the slider.
-        if ( ! current_user_can( 'edit_post', $post_id ) )
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
             return;
+        }
+
+        // If the post has just been published for the first time, set meta field for the gallery meta overlay helper.
+        if ( isset( $post->post_date ) && isset( $post->post_modified ) && $post->post_date === $post->post_modified ) {
+            update_post_meta( $post_id, '_eg_just_published', true );
+        }
 
         // Sanitize all user inputs.
         $settings = get_post_meta( $post_id, '_eg_gallery_data', true );
-        if ( empty( $settings ) )
+        if ( empty( $settings ) ) {
             $settings = array();
+        }
 
         // If the ID of the gallery is not set or is lost, replace it now.
-        if ( empty( $settings['id'] ) || ! $settings['id'] )
+        if ( empty( $settings['id'] ) || ! $settings['id'] ) {
             $settings['id'] = $post_id;
+        }
 
         // Save the config settings.
-        $settings['config']['columns']       = preg_replace( '#[^a-z0-9-_]#', '', $_POST['_envira_gallery']['columns'] );
-        $settings['config']['gutter']        = absint( $_POST['_envira_gallery']['gutter'] );
-        $settings['config']['margin']        = absint( $_POST['_envira_gallery']['margin'] );
-        $settings['config']['crop']          = isset( $_POST['_envira_gallery']['crop'] ) ? 1 : 0;
-        $settings['config']['crop_width']    = absint( $_POST['_envira_gallery']['crop_width'] );
-        $settings['config']['crop_height']   = absint( $_POST['_envira_gallery']['crop_height'] );
-        $settings['config']['classes']       = explode( "\n", $_POST['_envira_gallery']['classes'] );
-        $settings['config']['title']         = trim( strip_tags( $_POST['_envira_gallery']['title'] ) );
-        $settings['config']['slug']          = sanitize_text_field( $_POST['_envira_gallery']['slug'] );
+        $settings['config']['columns']     = preg_replace( '#[^a-z0-9-_]#', '', $_POST['_envira_gallery']['columns'] );
+        $settings['config']['gutter']      = absint( $_POST['_envira_gallery']['gutter'] );
+        $settings['config']['margin']      = absint( $_POST['_envira_gallery']['margin'] );
+        $settings['config']['crop']        = isset( $_POST['_envira_gallery']['crop'] ) ? 1 : 0;
+        $settings['config']['crop_width']  = absint( $_POST['_envira_gallery']['crop_width'] );
+        $settings['config']['crop_height'] = absint( $_POST['_envira_gallery']['crop_height'] );
+        $settings['config']['classes']     = explode( "\n", $_POST['_envira_gallery']['classes'] );
+        $settings['config']['title']       = trim( strip_tags( $_POST['_envira_gallery']['title'] ) );
+        $settings['config']['slug']        = sanitize_text_field( $_POST['_envira_gallery']['slug'] );
 
         // If on an envira post type, map the title and slug of the post object to the custom fields if no value exists yet.
         if ( isset( $post->post_type ) && 'envira' == $post->post_type ) {
-            if ( empty( $settings['config']['title'] ) )
+            if ( empty( $settings['config']['title'] ) ) {
                 $settings['config']['title'] = trim( strip_tags( $post->post_title ) );
+            }
 
-            if ( empty( $settings['config']['slug'] ) )
+            if ( empty( $settings['config']['slug'] ) ) {
                 $settings['config']['slug'] = sanitize_text_field( $post->post_name );
+            }
         }
 
         // Provide a filter to override settings.
@@ -919,13 +1027,6 @@ class Envira_Gallery_Metaboxes_Lite {
                                                     <p class="description"><?php _e( 'The image hyperlink determines what opens up in the lightbox once the image is clicked. Defaults to a larger version of itself.', 'envira-gallery' ); ?></p>
                                                 </td>
                                             </tr>
-                                            <tr id="envira-gallery-caption-box-<?php echo $id; ?>" valign="middle">
-                                                <th scope="row"><label for="envira-gallery-caption-<?php echo $id; ?>"><?php _e( 'Image Caption', 'envira-gallery' ); ?></label></th>
-                                                <td>
-                                                    <?php wp_editor( $data['caption'], 'envira-gallery-caption-' . $id, array( 'media_buttons' => false, 'tinymce' => false, 'textarea_name' => '_envira_gallery[meta_caption]', 'quicktags' => array( 'buttons' => 'strong,em,link,block,del,ins,img,ul,ol,li,code,close' ) ) ); ?>
-                                                    <p class="description"><?php _e( 'Captions appear on top of the image in the gallery lightbox.', 'envira-gallery' ); ?></p>
-                                                </td>
-                                            </tr>
                                             <?php do_action( 'envira_gallery_after_meta_settings', $id, $data, $post_id ); ?>
                                         </tbody>
                                     </table>
@@ -974,61 +1075,13 @@ class Envira_Gallery_Metaboxes_Lite {
     public function change_gallery_states( $post_id ) {
 
         $gallery_data = get_post_meta( $post_id, '_eg_gallery_data', true );
-        if ( ! empty( $gallery_data['gallery'] ) )
-            foreach ( $gallery_data['gallery'] as $id => $item )
+        if ( ! empty( $gallery_data['gallery'] ) ) {
+            foreach ( (array) $gallery_data['gallery'] as $id => $item ) {
                 $gallery_data['gallery'][$id]['status'] = 'active';
+            }
+        }
 
         update_post_meta( $post_id, '_eg_gallery_data', $gallery_data );
-
-    }
-
-    /**
-     * Helper method to crop gallery thumbnails to the specified sizes.
-     *
-     * @since 1.0.0
-     *
-     * @param array $args  Array of args used when cropping the images.
-     * @param int $post_id The current post ID.
-     */
-    public function crop_thumbnails( $args, $post_id ) {
-
-        // Gather all available images to crop.
-        $gallery_data = get_post_meta( $post_id, '_eg_gallery_data', true );
-        $images       = $gallery_data['gallery'];
-        $common       = Envira_Gallery_Common_Lite::get_instance();
-
-        // Loop through the images and crop them.
-        if ( ! empty( $images ) ) {
-            // Increase the time limit to account for large image sets and suspend cache invalidations.
-            set_time_limit( 0 );
-            wp_suspend_cache_invalidation( true );
-
-            foreach ( $images as $id => $item ) {
-                // Get the full image attachment. If it does not return the data we need, skip over it.
-                $image = wp_get_attachment_image_src( $id, 'full' );
-                if ( ! is_array( $image ) )
-                    continue;
-
-                // Generate the cropped image.
-                $cropped_image = $common->resize_image( $image[0], $args['width'], $args['height'], true, $args['position'], $args['quality'], $args['retina'] );
-
-                // If there is an error, possibly output error message, otherwise woot!
-                if ( is_wp_error( $cropped_image ) ) {
-                    // If debugging is defined, print out the error.
-                    if ( defined( 'ENVIRA_GALLERY_CROP_DEBUG' ) && ENVIRA_GALLERY_CROP_DEBUG )
-                        echo '<pre>' . var_export( $cropped_image->get_error_message(), true ) . '</pre>';
-                } else {
-                    $gallery_data['gallery'][$id]['thumb'] = $cropped_image;
-                }
-            }
-
-            // Turn off cache suspension and flush the cache to remove any cache inconsistencies.
-            wp_suspend_cache_invalidation( false );
-            wp_cache_flush();
-
-            // Update the gallery data.
-            update_post_meta( $post_id, '_eg_gallery_data', $gallery_data );
-        }
 
     }
 
@@ -1044,11 +1097,11 @@ class Envira_Gallery_Metaboxes_Lite {
 
         // Gather all available images to crop.
         $gallery_data = get_post_meta( $post_id, '_eg_gallery_data', true );
-        $images       = $gallery_data['gallery'];
+        $images       = ! empty( $gallery_data['gallery'] ) ? $gallery_data['gallery'] : false;
         $common       = Envira_Gallery_Common_Lite::get_instance();
 
         // Loop through the images and crop them.
-        if ( ! empty( $images ) ) {
+        if ( $images ) {
             // Increase the time limit to account for large image sets and suspend cache invalidations.
             set_time_limit( 0 );
             wp_suspend_cache_invalidation( true );
@@ -1056,8 +1109,9 @@ class Envira_Gallery_Metaboxes_Lite {
             foreach ( $images as $id => $item ) {
                 // Get the full image attachment. If it does not return the data we need, skip over it.
                 $image = wp_get_attachment_image_src( $id, 'full' );
-                if ( ! is_array( $image ) )
+                if ( ! is_array( $image ) ) {
                     continue;
+                }
 
                 // Generate the cropped image.
                 $cropped_image = $common->resize_image( $image[0], $args['width'], $args['height'], true, $args['position'], $args['quality'], $args['retina'] );
@@ -1065,8 +1119,9 @@ class Envira_Gallery_Metaboxes_Lite {
                 // If there is an error, possibly output error message, otherwise woot!
                 if ( is_wp_error( $cropped_image ) ) {
                     // If debugging is defined, print out the error.
-                    if ( defined( 'ENVIRA_GALLERY_CROP_DEBUG' ) && ENVIRA_GALLERY_CROP_DEBUG )
+                    if ( defined( 'ENVIRA_GALLERY_CROP_DEBUG' ) && ENVIRA_GALLERY_CROP_DEBUG ) {
                         echo '<pre>' . var_export( $cropped_image->get_error_message(), true ) . '</pre>';
+                    }
                 }
             }
 
@@ -1110,10 +1165,11 @@ class Envira_Gallery_Metaboxes_Lite {
         $post_id = ( null === $id ) ? $post->ID : $id;
 
         $settings = get_post_meta( $post_id, '_eg_gallery_data', true );
-        if ( isset( $settings['config'][$key] ) )
+        if ( isset( $settings['config'][$key] ) ) {
             return $settings['config'][$key];
-        else
+        } else {
             return $default ? $default : '';
+        }
 
     }
 
@@ -1183,7 +1239,7 @@ class Envira_Gallery_Metaboxes_Lite {
      */
     public function get_title_displays() {
 
-        $instance = Envira_Gallery_Common::get_instance();
+        $instance = Envira_Gallery_Common_Lite::get_instance();
         return $instance->get_title_displays();
 
     }
@@ -1197,7 +1253,7 @@ class Envira_Gallery_Metaboxes_Lite {
      */
     public function get_toolbar_positions() {
 
-        $instance = Envira_Gallery_Common::get_instance();
+        $instance = Envira_Gallery_Common_Lite::get_instance();
         return $instance->get_toolbar_positions();
 
     }
@@ -1211,7 +1267,7 @@ class Envira_Gallery_Metaboxes_Lite {
      */
     public function get_thumbnail_positions() {
 
-        $instance = Envira_Gallery_Common::get_instance();
+        $instance = Envira_Gallery_Common_Lite::get_instance();
         return $instance->get_thumbnail_positions();
 
     }
@@ -1225,8 +1281,9 @@ class Envira_Gallery_Metaboxes_Lite {
      */
     public static function get_instance() {
 
-        if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Envira_Gallery_Metaboxes_Lite ) )
+        if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Envira_Gallery_Metaboxes_Lite ) ) {
             self::$instance = new Envira_Gallery_Metaboxes_Lite();
+        }
 
         return self::$instance;
 

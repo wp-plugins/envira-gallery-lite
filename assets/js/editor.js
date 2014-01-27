@@ -51,31 +51,33 @@
 ;(function($){
     $(function(){
         // Close the modal window on user action.
+        var envira_trigger_target  = envira_editor_frame = false;
         var envira_append_and_hide = function(e){
             e.preventDefault();
             $('.envira-gallery-default-ui .selected').removeClass('details selected');
             $('.envira-gallery-default-ui').appendTo('.envira-gallery-default-ui-wrapper').hide();
-            envira_trigger_target = false;
-        }, envira_trigger_target;
+            envira_trigger_target = envira_editor_frame = false;
+        };
 
-        $(document.body).on('click', '.envira-gallery-choose-gallery, .envira-gallery-modal-trigger', function(e){
+        $(document).on('click', '.envira-gallery-choose-gallery, .envira-gallery-modal-trigger', function(e){
             e.preventDefault();
 
             // Store the trigger target.
             envira_trigger_target = e.target;
 
             // Show the modal.
+            envira_editor_frame = true;
             $('.envira-gallery-default-ui').appendTo('body').show();
 
-            $(document.body).on('click', '.media-modal-close, .media-modal-backdrop, .envira-gallery-cancel-insertion', envira_append_and_hide);
-            $(document.body).on('keydown', function(e){
-                e.preventDefault();
-                if ( 27 == e.keyCode )
+            $(document).on('click', '.media-modal-close, .media-modal-backdrop, .envira-gallery-cancel-insertion', envira_append_and_hide);
+            $(document).on('keydown', function(e){
+                if ( 27 == e.keyCode && envira_editor_frame ) {
                     envira_append_and_hide(e);
+                }
             });
         });
 
-        $(document.body).on('click', '.envira-gallery-default-ui .thumbnail, .envira-gallery-default-ui .check, .envira-gallery-default-ui .media-modal-icon', function(e){
+        $(document).on('click', '.envira-gallery-default-ui .thumbnail, .envira-gallery-default-ui .check, .envira-gallery-default-ui .media-modal-icon', function(e){
             e.preventDefault();
             if ( $(this).parent().parent().hasClass('selected') ) {
                 $(this).parent().parent().removeClass('details selected');
@@ -87,13 +89,13 @@
             }
         });
 
-        $(document.body).on('click', '.envira-gallery-default-ui .check', function(e){
+        $(document).on('click', '.envira-gallery-default-ui .check', function(e){
             e.preventDefault();
             $(this).parent().parent().removeClass('details selected');
             $('.envira-gallery-insert-gallery').attr('disabled', 'disabled');
         });
 
-        $(document.body).on('click', '.envira-gallery-default-ui .envira-gallery-insert-gallery', function(e){
+        $(document).on('click', '.envira-gallery-default-ui .envira-gallery-insert-gallery', function(e){
             e.preventDefault();
 
             // Either insert into an editor or make an ajax request.
@@ -103,7 +105,7 @@
                 // Make the ajax request.
                 var req_data = {
                     action: 'envira_gallery_load_gallery_data',
-                    id:     $('.envira-gallery-default-ui .selected').data('envira-gallery-id')
+                    id:     $('.envira-gallery-default-ui:first .selected').data('envira-gallery-id')
                 };
                 $.post(ajaxurl, req_data, function(res){
                     // Trigger the event.

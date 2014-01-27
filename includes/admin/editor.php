@@ -70,10 +70,6 @@ class Envira_Gallery_Editor_Lite {
      */
     public function media_button( $buttons ) {
 
-        // Return early if not in the post editing/creation process.
-        if ( isset( get_current_screen()->base ) && 'post' !== get_current_screen()->base )
-            return $buttons;
-
         // Create the media button.
         $button  = '<style type="text/css">@media only screen and (-webkit-min-device-pixel-ratio: 2),only screen and (min--moz-device-pixel-ratio: 2),only screen and (-o-min-device-pixel-ratio: 2/1),only screen and (min-device-pixel-ratio: 2),only screen and (min-resolution: 192dpi),only screen and (min-resolution: 2dppx) { #envira-media-modal-button .envira-media-icon[style] { background-image: url(' . plugins_url( 'assets/css/images/menu-icon@2x.png', $this->base->file ) . ') !important; background-size: 16px 16px !important; } }</style>';
         $button .= '<a id="envira-media-modal-button" href="#" class="button envira-gallery-choose-gallery" title="' . esc_attr__( 'Add Gallery', 'envira-gallery' ) . '" style="padding-left: .4em;"><span class="envira-media-icon" style="background: transparent url(' . plugins_url( 'assets/css/images/menu-icon.png', $this->base->file ) . ') no-repeat scroll 0 0; width: 16px; height: 16px; display: inline-block; vertical-align: text-top;"></span> ' . __( 'Add Gallery', 'envira-gallery' ) . '</a>';
@@ -105,16 +101,21 @@ class Envira_Gallery_Editor_Lite {
      *
      * @since 1.0.0
      *
+     * @global object $post The current post object.
      * @return string Empty string if no galleries are found, otherwise modal UI.
      */
     public function get_gallery_selection_modal() {
 
-        $galleries = $this->base->get_galleries();
-        if ( ! $galleries || $this->loaded )
+        // Return early if already loaded.
+        if ( $this->loaded ) {
             return '';
+        }
 
         // Set the loaded flag to true.
         $this->loaded = true;
+
+        global $post;
+        $galleries = $this->base->get_galleries();
 
         ob_start();
         ?>
@@ -131,18 +132,30 @@ class Envira_Gallery_Editor_Lite {
                             <div class="media-frame-content">
                                 <div class="attachments-browser">
                                     <ul class="envira-gallery-meta attachments" style="padding-left: 8px; top: 1em;">
-                                        <?php foreach ( $galleries as $gallery ) : ?>
+                                        <li class="attachment" data-envira-gallery-id="<?php echo absint( $post->ID ); ?>" style="margin: 8px;">
+                                            <div class="attachment-preview landscape">
+                                                <div class="thumbnail" style="display: table;">
+                                                    <div style="display: table-cell; vertical-align: middle; text-align: center;">
+                                                        <h3 style="margin: 0;color: #7ad03a;"><?php _e( 'This Post\'s Gallery', 'envira-gallery' ); ?></h3>
+                                                        <code style="color: #7ad03a;">[envira-gallery id="<?php echo absint( $post->ID ); ?>"]</code>
+                                                    </div>
+                                                </div>
+                                                <a class="check" href="#"><div class="media-modal-icon"></div></a>
+                                            </div>
+                                        </li>
+                                        <?php foreach ( (array) $galleries as $gallery ) : if ( $post->ID == $gallery['id'] ) continue; ?>
                                         <li class="attachment" data-envira-gallery-id="<?php echo absint( $gallery['id'] ); ?>" style="margin: 8px;">
                                             <div class="attachment-preview landscape">
                                                 <div class="thumbnail" style="display: table;">
                                                     <div style="display: table-cell; vertical-align: middle; text-align: center;">
                                                         <?php
-                                                        if ( ! empty( $gallery['config']['title'] ) )
+                                                        if ( ! empty( $gallery['config']['title'] ) ) {
                                                             $title = $gallery['config']['title'];
-                                                        else if ( ! empty( $gallery['config']['slug'] ) )
+                                                        } else if ( ! empty( $gallery['config']['slug'] ) ) {
                                                             $title = $gallery['config']['title'];
-                                                        else
+                                                        } else {
                                                             $title = sprintf( __( 'Gallery ID #%s', 'envira-gallery' ), $gallery['id'] );
+                                                        }
                                                         ?>
                                                         <h3 style="margin: 0;"><?php echo $title; ?></h3>
                                                         <code>[envira-gallery id="<?php echo absint( $gallery['id'] ); ?>"]</code>
@@ -205,8 +218,9 @@ class Envira_Gallery_Editor_Lite {
      */
     public static function get_instance() {
 
-        if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Envira_Gallery_Editor_Lite ) )
+        if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Envira_Gallery_Editor_Lite ) ) {
             self::$instance = new Envira_Gallery_Editor_Lite();
+        }
 
         return self::$instance;
 

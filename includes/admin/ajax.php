@@ -7,6 +7,7 @@
  * @package Envira_Gallery_Lite
  * @author  Thomas Griffin
  */
+
 add_action( 'wp_ajax_envira_gallery_load_image', 'envira_gallery_lite_ajax_load_image' );
 /**
  * Loads an image into a gallery.
@@ -24,28 +25,32 @@ function envira_gallery_lite_ajax_load_image() {
 
     // Set post meta to show that this image is attached to one or more Envira galleries.
     $has_gallery = get_post_meta( $id, '_eg_has_gallery', true );
-    if ( empty( $has_gallery ) )
+    if ( empty( $has_gallery ) ) {
         $has_gallery = array();
+    }
 
     $has_gallery[] = $post_id;
     update_post_meta( $id, '_eg_has_gallery', $has_gallery );
 
     // Set post meta to show that this image is attached to a gallery on this page.
     $in_gallery = get_post_meta( $post_id, '_eg_in_gallery', true );
-    if ( empty( $in_gallery ) )
+    if ( empty( $in_gallery ) ) {
         $in_gallery = array();
+    }
 
     $in_gallery[] = $id;
     update_post_meta( $post_id, '_eg_in_gallery', $in_gallery );
 
     // Set data and order of image in gallery.
     $gallery_data = get_post_meta( $post_id, '_eg_gallery_data', true );
-    if ( empty( $gallery_data ) )
+    if ( empty( $gallery_data ) ) {
         $gallery_data = array();
+    }
 
     // If no gallery ID has been set, set it now.
-    if ( empty( $gallery_data['id'] ) )
+    if ( empty( $gallery_data['id'] ) ) {
         $gallery_data['id'] = $post_id;
+    }
 
     // Set data and update the meta information.
     $gallery_data = envira_gallery_lite_ajax_prepare_gallery_data( $gallery_data, $id );
@@ -80,8 +85,8 @@ function envira_gallery_lite_ajax_load_library() {
 
     // Grab the library contents with the included offset parameter.
     $library = get_posts( array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'post_status' => 'any', 'posts_per_page' => 20, 'offset' => $offset ) );
-    if ( $library ) :
-        foreach ( (array) $library as $image ) :
+    if ( $library ) {
+        foreach ( (array) $library as $image ) {
             $has_gallery = get_post_meta( $image->ID, '_eg_has_gallery', true );
             $class       = $has_gallery && in_array( $post_id, (array) $has_gallery ) ? ' selected envira-gallery-in-gallery' : '';
 
@@ -96,8 +101,8 @@ function envira_gallery_lite_ajax_load_library() {
                     $html .= '<a class="check" href="#"><div class="media-modal-icon"></div></a>';
                 $html .= '</div>';
             $html .= '</li>';
-        endforeach;
-    endif;
+        }
+    }
 
     echo json_encode( array( 'html' => stripslashes( $html ) ) );
     die;
@@ -122,8 +127,8 @@ function envira_gallery_lite_ajax_library_search() {
 
     // Grab the library contents with the included offset parameter.
     $library = get_posts( array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'post_status' => 'any', 'posts_per_page' => -1, 's' => $search ) );
-    if ( $library ) :
-        foreach ( (array) $library as $image ) :
+    if ( $library ) {
+        foreach ( (array) $library as $image ) {
             $has_gallery = get_post_meta( $image->ID, '_eg_has_gallery', true );
             $class       = $has_gallery && in_array( $post_id, (array) $has_gallery ) ? ' selected envira-gallery-in-gallery' : '';
 
@@ -138,8 +143,8 @@ function envira_gallery_lite_ajax_library_search() {
                     $html .= '<a class="check" href="#"><div class="media-modal-icon"></div></a>';
                 $html .= '</div>';
             $html .= '</li>';
-        endforeach;
-    endif;
+        }
+    }
 
     echo json_encode( array( 'html' => stripslashes( $html ) ) );
     die;
@@ -164,24 +169,28 @@ function envira_gallery_lite_ajax_insert_images() {
 
     // Grab and update any gallery data if necessary.
     $in_gallery = get_post_meta( $post_id, '_eg_in_gallery', true );
-    if ( empty( $in_gallery ) )
+    if ( empty( $in_gallery ) ) {
         $in_gallery = array();
+    }
 
     // Set data and order of image in gallery.
     $gallery_data = get_post_meta( $post_id, '_eg_gallery_data', true );
-    if ( empty( $gallery_data ) )
+    if ( empty( $gallery_data ) ) {
         $gallery_data = array();
+    }
 
     // If no gallery ID has been set, set it now.
-    if ( empty( $gallery_data['id'] ) )
+    if ( empty( $gallery_data['id'] ) ) {
         $gallery_data['id'] = $post_id;
+    }
 
     // Loop through the images and add them to the gallery.
     foreach ( (array) $images as $i => $id ) {
         // Update the attachment image post meta first.
         $has_gallery = get_post_meta( $id, '_eg_has_gallery', true );
-        if ( empty( $has_gallery ) )
+        if ( empty( $has_gallery ) ) {
             $has_gallery = array();
+        }
 
         $has_gallery[] = $post_id;
         update_post_meta( $id, '_eg_has_gallery', $has_gallery );
@@ -221,8 +230,9 @@ function envira_gallery_lite_ajax_sort_images() {
     $new_order    = array();
 
     // Loop through the order and generate a new array based on order received.
-    foreach ( $order as $id )
+    foreach ( $order as $id ) {
         $new_order['gallery'][$id] = $gallery_data['gallery'][$id];
+    }
 
     // Update the gallery data.
     update_post_meta( $post_id, '_eg_gallery_data', $new_order );
@@ -253,11 +263,13 @@ function envira_gallery_lite_ajax_remove_image() {
     // Unset the image from the gallery, in_gallery and has_gallery checkers.
     unset( $gallery_data['gallery'][$attach_id] );
 
-    if ( ( $key = array_search( $attach_id, (array) $in_gallery ) ) !== false )
+    if ( ( $key = array_search( $attach_id, (array) $in_gallery ) ) !== false ) {
         unset( $in_gallery[$key] );
+    }
 
-    if ( ( $key = array_search( $post_id, (array) $has_gallery ) ) !== false )
+    if ( ( $key = array_search( $post_id, (array) $has_gallery ) ) !== false ) {
         unset( $has_gallery[$key] );
+    }
 
     // Update the gallery data.
     update_post_meta( $post_id, '_eg_gallery_data', $gallery_data );
@@ -289,14 +301,17 @@ function envira_gallery_lite_ajax_save_meta() {
     $meta         = $_POST['meta'];
     $gallery_data = get_post_meta( $post_id, '_eg_gallery_data', true );
 
-    if ( isset( $meta['title'] ) )
-        $gallery_data['gallery'][$attach_id]['title'] = trim( wpautop( wptexturize( $meta['title'] ) ) );
+    if ( isset( $meta['title'] ) ) {
+        $gallery_data['gallery'][$attach_id]['title'] = trim( $meta['title'] );
+    }
 
-    if ( isset( $meta['alt'] ) )
+    if ( isset( $meta['alt'] ) ) {
         $gallery_data['gallery'][$attach_id]['alt'] = trim( esc_html( $meta['alt'] ) );
+    }
 
-    if ( isset( $meta['link'] ) )
+    if ( isset( $meta['link'] ) ) {
         $gallery_data['gallery'][$attach_id]['link'] = esc_url( $meta['link'] );
+    }
 
     // Allow filtering of meta before saving.
     $gallery_data = apply_filters( 'envira_gallery_ajax_save_meta', $gallery_data, $meta, $attach_id, $post_id );
@@ -334,8 +349,9 @@ function envira_gallery_lite_ajax_refresh() {
     }
 
     // Loop through the data and build out the gallery view.
-    foreach ( (array) $gallery_data['gallery'] as $id => $data )
+    foreach ( (array) $gallery_data['gallery'] as $id => $data ) {
         $gallery .= Envira_Gallery_Metaboxes_Lite::get_instance()->get_gallery_item( $id, $data, $post_id );
+    }
 
     echo json_encode( array( 'success' => $gallery ) );
     die;

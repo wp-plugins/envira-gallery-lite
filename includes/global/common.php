@@ -10,12 +10,12 @@
 class Envira_Gallery_Common_Lite {
 
     /**
-	 * Holds the class object.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var object
-	 */
+     * Holds the class object.
+     *
+     * @since 1.0.0
+     *
+     * @var object
+     */
     public static $instance;
 
     /**
@@ -37,10 +37,10 @@ class Envira_Gallery_Common_Lite {
     public $base;
 
     /**
-	 * Primary class constructor.
-	 *
-	 * @since 1.0.0
-	 */
+     * Primary class constructor.
+     *
+     * @since 1.0.0
+     */
     public function __construct() {
 
         // Load the base class object.
@@ -102,7 +102,7 @@ class Envira_Gallery_Common_Lite {
                 'value' => 'base',
                 'name'  => __( 'Base', 'envira-gallery' ),
                 'file'  => $this->base->file
-            ),
+            )
         );
 
         return apply_filters( 'envira_gallery_gallery_themes', $themes );
@@ -123,7 +123,7 @@ class Envira_Gallery_Common_Lite {
                 'value' => 'base',
                 'name'  => __( 'Base', 'envira-gallery' ),
                 'file'  => $this->base->file
-            ),
+            )
         );
 
         return apply_filters( 'envira_gallery_lightbox_themes', $themes );
@@ -224,7 +224,7 @@ class Envira_Gallery_Common_Lite {
 
         global $id, $post;
 
-		// Get the current post ID.
+        // Get the current post ID.
         $post_id = ( null === $id ) ? $post->ID : $id;
 
         // Prepare default values.
@@ -286,13 +286,14 @@ class Envira_Gallery_Common_Lite {
 
         // Get common vars.
         $args   = func_get_args();
-        $common = self::get_image_info( $args );
+        $common = $this->get_image_info( $args );
 
         // Unpack variables if an array, otherwise return WP_Error.
-        if ( is_wp_error( $common ) )
+        if ( is_wp_error( $common ) ) {
             return $common;
-        else
+        } else {
             extract( $common );
+        }
 
         // If the file doesn't exist yet, we need to create it.
         if ( ! file_exists( $dest_file_name ) ) {
@@ -303,8 +304,9 @@ class Envira_Gallery_Common_Lite {
             $editor = wp_get_image_editor( $file_path );
 
             // If an editor cannot be found, the user needs to have GD or Imagick installed.
-            if ( is_wp_error( $editor ) )
+            if ( is_wp_error( $editor ) ) {
                 return new WP_Error( 'envira-gallery-error-no-editor', __( 'No image editor could be selected. Please verify with your webhost that you have either the GD or Imagick image library compiled with your PHP install on your server.', 'envira-gallery' ) );
+            }
 
             // Set the image editor quality.
             $editor->set_quality( $quality );
@@ -370,8 +372,9 @@ class Envira_Gallery_Common_Lite {
                 if ( isset( $metadata['image_meta'] ) ) {
                     $md = $saved['width'] . 'x' . $saved['height'];
 
-                    if ( $crop )
-                        $md .= ($align) ? "_${align}" : "_c";
+                    if ( $crop ) {
+                        $md .= $align ? "_${align}" : "_c";
+                    }
 
                     $metadata['image_meta']['resized_images'][] = $md;
                     wp_update_attachment_metadata( $get_attachment[0]->ID, $metadata );
@@ -404,8 +407,9 @@ class Envira_Gallery_Common_Lite {
         list( $url, $width, $height, $crop, $align, $quality, $retina ) = $args;
 
         // Return an error if no URL is present.
-        if ( empty( $url ) )
+        if ( empty( $url ) ) {
             return new WP_Error( 'envira-gallery-error-no-url', __( 'No image URL specified for cropping.', 'envira-gallery' ) );
+        }
 
         // Get the image file path.
         $urlinfo       = parse_url( $url );
@@ -427,11 +431,12 @@ class Envira_Gallery_Common_Lite {
         }
 
         // Get original image size
-        $size = is_user_logged_in() ? getimagesize( $file_path ) : @getimagesize( $file_path );
+        $size = @getimagesize( $file_path );
 
         // If no size data obtained, return an error.
-        if ( ! $size )
+        if ( ! $size ) {
             return new WP_Error( 'envira-gallery-error-no-size', __( 'The dimensions of the original image could not be retrieved for cropping.', 'envira-gallery' ) );
+        }
 
         // Set original width and height.
         list( $orig_width, $orig_height, $orig_type ) = $size;
@@ -462,8 +467,9 @@ class Envira_Gallery_Common_Lite {
         $suffix = "${dest_width}x${dest_height}";
 
         // Set alignment information on the file.
-        if ( $crop )
+        if ( $crop ) {
             $suffix .= ( $align ) ? "_${align}" : "_c";
+        }
 
         // Get the destination file name
         $dest_file_name = "${dir}/${name}-${suffix}.${ext}";
@@ -500,22 +506,24 @@ class Envira_Gallery_Common_Lite {
         delete_transient( '_eg_cache_all' );
 
         // Possibly delete slug gallery cache if available.
-        if ( ! empty( $slug ) )
+        if ( ! empty( $slug ) ) {
             delete_transient( '_eg_cache_' . $slug );
+        }
 
     }
 
     /**
-	 * Returns the singleton instance of the class.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return object The Envira_Gallery_Common_Lite object.
-	 */
+     * Returns the singleton instance of the class.
+     *
+     * @since 1.0.0
+     *
+     * @return object The Envira_Gallery_Common_Lite object.
+     */
     public static function get_instance() {
 
-        if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Envira_Gallery_Common_Lite ) )
+        if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Envira_Gallery_Common_Lite ) ) {
             self::$instance = new Envira_Gallery_Common_Lite();
+        }
 
         return self::$instance;
 

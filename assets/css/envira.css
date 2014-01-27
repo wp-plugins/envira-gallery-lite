@@ -140,6 +140,14 @@
  *   http://www.gnu.org/licenses/gpl.html
  */
 
+#fancybox-wrap,
+#fancybox-wrap *,
+#fancybox-overlay {
+    box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+}
+
 #fancybox-loading {
 	position: fixed;
 	top: 50%;
@@ -424,6 +432,7 @@
 	width: auto;
 }
 
+#fancybox-title-float-wrap tbody,
 #fancybox-title-float-wrap td {
 	border: none;
 	white-space: nowrap;

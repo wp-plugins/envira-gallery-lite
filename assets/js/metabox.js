@@ -18,15 +18,35 @@
  * ========================================================== */
 ;(function($){
     $(function(){
+        // Apply hiding updates to settings not available in the Lite version.
+        $('.envira-lite-disabled input, .envira-lite-disabled select, .envira-lite-disabled option, .envira-lite-disabled textarea').each(function(i, el){
+            $(this).prop('disabled', true);
+        });
+        $('.envira-lite-disabled th').each(function(i, el){
+            $('<p class="envira-lite-upgrade">' + envira_gallery_metabox.upgrade + '</p>' + envira_gallery_metabox.upgrade_btn).appendTo($(this));
+        });
+
         // Initialize the gallery tabs.
-        var envira_tabs = $('#envira-tabs');
-        envira_tabs.tabs();
+        var envira_tabs     = $('#envira-tabs'),
+            envira_tabs_nav = $('#envira-tabs-nav');
+        $('#envira-tabs-nav li a').on('click', function(e){
+            e.preventDefault();
+            var $this = $(this);
+            if ( $this.parent().hasClass('envira-active') ) {
+                return;
+            } else {
+                var current = envira_tabs_nav.find('.envira-active').removeClass('envira-active').find('a').attr('href');
+                $this.parent().addClass('envira-active');
+                envira_tabs.find(current).removeClass('envira-active').hide();
+                envira_tabs.find($this.attr('href')).addClass('envira-active').show();
+            }
+        });
 
         // Place a custom progress bar directly underneath the image dropzone.
         $('#envira-gallery .drag-drop-inside').append('<div class="envira-progress-bar"><div></div></div>');
 
         // Append a link to use images from the user's media library.
-        $('#envira-gallery .max-upload-size').append(' <a class="envira-media-library" href="#" title="' + envira_gallery_metabox.gallery + '">' + envira_gallery_metabox.gallery + '</a>');
+        $('#envira-gallery .max-upload-size').append(' <a class="envira-media-library button button-primary" href="#" title="' + envira_gallery_metabox.gallery + '" style="vertical-align: baseline;">' + envira_gallery_metabox.gallery + '</a>');
 
         // Attach to when files are being uploaded - uploader is the global variable that will handle the uploading process.
         var envira_uploader = uploader,
@@ -71,23 +91,36 @@
             });
         }
 
-        // Apply hiding updates to settings not available in the Lite version.
-        $('.envira-lite-disabled input, .envira-lite-disabled select, .envira-lite-disabled option, .envira-lite-disabled textarea').each(function(i, el){
-            $(this).prop('disabled', true);
-        });
-        $('.envira-lite-disabled th').each(function(i, el){
-            $('<p class="envira-lite-upgrade">' + envira_gallery_metabox.upgrade + '</p>' + envira_gallery_metabox.upgrade_btn).appendTo($(this));
-        });
-
         // Conditionally show necessary fields.
         enviraConditionals();
+
+        // Handle the meta icon helper.
+        if ( 0 !== $('.envira-helper-needed').length ) {
+            $('<div class="envira-meta-helper-overlay" />').prependTo('#envira-gallery');
+        }
+
+        $(document).on('click', '.envira-meta-icon', function(e){
+            e.preventDefault();
+            var $this     = $(this),
+                container = $this.parent(),
+                helper    = $this.next();
+            if ( helper.is(':visible') ) {
+                $('.envira-meta-helper-overlay').remove();
+                container.removeClass('envira-helper-active');
+            } else {
+                if ( 0 === $('.envira-meta-helper-overlay').length ) {
+                    $('<div class="envira-meta-helper-overlay" />').prependTo('#envira-gallery');
+                }
+                container.addClass('envira-helper-active');
+            }
+        });
 
         // Open up the media manager modal.
         $(document).on('click', '.envira-media-library', function(e){
             e.preventDefault();
 
             // Show the modal.
-            main_frame = true;
+            envira_main_frame = true;
             $('#envira-gallery-upload-ui').appendTo('body').show();
         });
 
@@ -110,10 +143,10 @@
 
             // Prepare our data to be sent via Ajax.
             var load = {
-                action:     'envira_gallery_load_library',
-                offset:     parseInt($this.attr('data-envira-gallery-offset')),
-                id:         envira_gallery_metabox.id,
-                nonce:      envira_gallery_metabox.load_gallery
+                action: 'envira_gallery_load_library',
+                offset: parseInt($this.attr('data-envira-gallery-offset')),
+                id:     envira_gallery_metabox.id,
+                nonce:  envira_gallery_metabox.load_gallery
             };
 
             // Process the Ajax response and output all the necessary data.
@@ -143,12 +176,12 @@
             var $this = $(this);
             $this.prev().css({'display' : 'inline-block', 'margin-top' : '1px', 'vertical-align' : 'middle', 'margin-right' : '4px'});
 
-            var text        = $(this).val();
-            var search      = {
-                action:     'envira_gallery_library_search',
-                nonce:      envira_gallery_metabox.library_search,
-                post_id:    envira_gallery_metabox.id,
-                search:     text
+            var text     = $(this).val();
+            var search   = {
+                action:  'envira_gallery_library_search',
+                nonce:   envira_gallery_metabox.library_search,
+                post_id: envira_gallery_metabox.id,
+                search:  text
             };
 
             // Send the ajax request with a delay (500ms after the user stops typing).
@@ -229,16 +262,16 @@
             update: function(event, ui) {
                 // Make ajax request to sort out items.
                 var opts = {
-                    url:        envira_gallery_metabox.ajax,
-                    type:       'post',
-                    async:      true,
-                    cache:      false,
-                    dataType:   'json',
+                    url:      envira_gallery_metabox.ajax,
+                    type:     'post',
+                    async:    true,
+                    cache:    false,
+                    dataType: 'json',
                     data: {
-                        action:     'envira_gallery_sort_images',
-                        order:      gallery.sortable('toArray').toString(),
-                        post_id:    envira_gallery_metabox.id,
-                        nonce:      envira_gallery_metabox.sort
+                        action:  'envira_gallery_sort_images',
+                        order:   gallery.sortable('toArray').toString(),
+                        post_id: envira_gallery_metabox.id,
+                        nonce:   envira_gallery_metabox.sort
                     },
                     success: function(response) {
                         return;
@@ -263,10 +296,10 @@
             // Prepare our data to be sent via Ajax.
             var attach_id = $(this).parent().attr('id'),
                 remove = {
-                    action:         'envira_gallery_remove_image',
-                    attachment_id:  attach_id,
-                    post_id:        envira_gallery_metabox.id,
-                    nonce:          envira_gallery_metabox.remove_nonce
+                    action:        'envira_gallery_remove_image',
+                    attachment_id: attach_id,
+                    post_id:       envira_gallery_metabox.id,
+                    nonce:         envira_gallery_metabox.remove_nonce
                 };
 
             // Process the Ajax response and output all the necessary data.
@@ -292,16 +325,18 @@
                 formfield = 'envira-gallery-meta-' + attach_id;
 
             // Show the modal.
+            envira_main_frame = true;
             $('#' + formfield).appendTo('body').show();
 
             // Close the modal window on user action
             var append_and_hide = function(e){
                 e.preventDefault();
                 $('#' + formfield).appendTo('#' + attach_id).hide();
+                envira_main_frame = false;
             };
             $(document).on('click.enviraIframe', '.media-modal-close, .media-modal-backdrop', append_and_hide);
             $(document).on('keydown.enviraIframe', function(e){
-                if ( 27 == e.keyCode )
+                if ( 27 == e.keyCode && envira_main_frame )
                     append_and_hide(e);
             });
         });
@@ -350,7 +385,7 @@
         });
 
         // Append spinner when importing a gallery.
-        $('#envira-gallery-import-submit').on('click', function(){
+        $('#envira-gallery-import-submit').on('click', function(e){
             $(this).next().css('display', 'inline-block');
             if ( $('#envira-config-import-gallery').val().length === 0 ) {
                 e.preventDefault();
@@ -369,16 +404,16 @@
         })();
 
         // Close the modal window on user action.
-        var main_frame = false;
+        var envira_main_frame = false;
         var append_and_hide = function(e){
             e.preventDefault();
             $('#envira-gallery-upload-ui').appendTo('#envira-gallery-upload-ui-wrapper').hide();
             enviraRefresh();
-            main_frame = false;
+            envira_main_frame = false;
         };
         $(document).on('click', '#envira-gallery-upload-ui .media-modal-close, #envira-gallery-upload-ui .media-modal-backdrop', append_and_hide);
         $(document).on('keydown', function(e){
-            if ( 27 == e.keyCode && main_frame )
+            if ( 27 == e.keyCode && envira_main_frame )
                 append_and_hide(e);
         });
 
@@ -401,7 +436,7 @@
                         $('#envira-gallery-output').html(res.success);
                         $('#envira-gallery-output').find('.wp-editor-wrap').each(function(i, el){
                             var id = $(el).attr('id').split('-')[4];
-                            quicktags({id: 'envira-gallery-caption-' + id, buttons: 'strong,em,link,ul,ol,li,close'});
+                            quicktags({id: 'envira-gallery-title-' + id, buttons: 'strong,em,link,ul,ol,li,close'});
                             QTags._buttonsInit(); // Force buttons to initialize.
                         });
 

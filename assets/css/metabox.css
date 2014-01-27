@@ -8,19 +8,23 @@
     margin-top: 0;
 }
 
+#envira-gallery {
+    position: relative;
+}
+
 #envira-gallery .envira-clear {
-	clear: both;
+    clear: both;
 }
 
 #envira-gallery .envira-clear:after {
-	clear: both;
-	content: '.';
-	display: block;
-	height: 0;
-	line-height: 0;
-	overflow: auto;
-	visibility: hidden;
-	zoom: 1;
+    clear: both;
+    content: '.';
+    display: block;
+    height: 0;
+    line-height: 0;
+    overflow: auto;
+    visibility: hidden;
+    zoom: 1;
 }
 
 #envira-gallery p.description {
@@ -30,6 +34,10 @@
 #envira-gallery .inside {
     margin: 10px 0;
     padding: 0 10px;
+}
+
+#envira-gallery #envira-tabs {
+    position: relative;
 }
 
 #envira-gallery #envira-tabs-nav {
@@ -54,7 +62,7 @@
     outline: none;
 }
 
-#envira-gallery #envira-tabs-nav li.ui-state-active a {
+#envira-gallery #envira-tabs-nav li.envira-active a {
     border: 1px solid #cecece;
     border-bottom-color: #fff;
     -moz-border-radius: 3px 3px 0 0;
@@ -66,6 +74,73 @@
 
 #envira-gallery #envira-tabs-nav li a:hover {
     color: #21759b;
+}
+
+#envira-gallery .envira-meta-close-text {
+    display: none;
+    color: #fff;
+    font-style: italic;
+    font-size: 11px;
+    position: absolute;
+    z-index: 98;
+    top: 6px;
+    right: 27px;
+}
+
+#envira-gallery .envira-helper-active .envira-meta-close-text {
+    display: inline;
+}
+
+#envira-gallery .envira-meta-icon {
+    position: absolute;
+    width: 19px;
+    height: 16px;
+    top: 6px;
+    right: 0;
+    background: url(images/meta.png) no-repeat scroll 0 0;
+    display: block;
+    outline: none;
+    z-index: 98;
+}
+
+#envira-gallery .envira-helper-active .envira-meta-icon {
+    background-image: url(images/meta-active.png);
+}
+
+#envira-gallery .envira-meta-information {
+    display: none;
+    padding: 0 1em 1em;
+    position: absolute;
+    right: 0;
+    top: 30px;
+    width: 278px;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    -webkit-box-shadow: 0 5px 15px rgba(0,0,0,.7);
+    box-shadow: 0 5px 15px rgba(0,0,0,.7);
+    z-index: 98;
+}
+
+#envira-gallery .envira-helper-active .envira-meta-information {
+    display: block;
+}
+
+#envira-gallery .envira-meta-helper-overlay {
+    position: absolute;
+    z-index: 97;
+    background: #000;
+    opacity: .7;
+    filter: alpha(opacity=70);
+    width: 100%;
+    height: 100%;
+}
+
+#envira-gallery .envira-tab {
+    display: none;
+}
+
+#envira-gallery .envira-tab.envira-active {
+    display: block;
 }
 
 #envira-gallery  .envira-tab p.envira-intro {
@@ -117,7 +192,7 @@
 }
 
 #envira-gallery .envira-tab {
-    min-height: 200px;
+    min-height: 320px;
 }
 
 #envira-gallery #envira-gallery-output {
@@ -145,6 +220,8 @@
     box-shadow: 0 1px 2px rgba(0,0,0,.06);
     cursor: move;
     position: relative;
+    width: 150px;
+    height: 150px;
 }
 
 #envira-gallery #envira-gallery-output li.envira-gallery-status-pending {
@@ -167,150 +244,146 @@
 
 #envira-gallery #envira-gallery-output li img {
     display: block;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 #envira-gallery #envira-gallery-output li .envira-gallery-remove-image {
-	background: url(images/delete.png) no-repeat scroll 0 0;
-	display: block;
-	height: 16px;
-	left: -8px;
-	outline: none;
-	position: absolute;
-	top: -8px;
-	width: 16px;
-	z-index: 20;
+    background: url(images/delete.png) no-repeat scroll 0 0;
+    display: block;
+    height: 16px;
+    left: -8px;
+    outline: none;
+    position: absolute;
+    top: -8px;
+    width: 16px;
+    z-index: 20;
 }
 
 #envira-gallery #envira-gallery-output li .envira-gallery-modify-image {
-	background: url(images/modify.png) no-repeat scroll 0 0;
-	display: block;
-	height: 16px;
-	left: 12px;
-	outline: none;
-	position: absolute;
-	top: -9px;
-	width: 16px;
-	z-index: 20;
+    background: url(images/modify.png) no-repeat scroll 0 0;
+    display: block;
+    height: 16px;
+    left: 12px;
+    outline: none;
+    position: absolute;
+    top: -8px;
+    width: 16px;
+    z-index: 20;
 }
 
 #media-items .media-item .edit-attachment,
 .envira-gallery-media-frame .upload-flash-bypass {
-	display: none !important;
+    display: none !important;
 }
 
 #media-items {
-	margin: 0 0 16px;
-	overflow: hidden;
-	width: 100%;
+    margin: 0 0 16px;
+    overflow: hidden;
+    width: 100%;
 }
 
 #media-items .media-item {
-	width: auto;
-	float: left;
-	margin: 0 8px 8px 0;
+    width: auto;
+    float: left;
+    margin: 0 8px 8px 0;
 }
 
 #media-items .media-item img {
-	max-width: none;
-	max-height: none;
-	width: 150px;
-	height: 150px;
-	float: none;
-	margin: 4px;
-	display: block;
+    max-width: none;
+    max-height: none;
+    width: 150px;
+    height: 150px;
+    float: none;
+    margin: 4px;
+    display: block;
 }
-
-.envira-lite-disabled th,
-.envira-lite-disabled td,
-.envira-lite-disabled .description {
-    color: #aaa;
-}
-
-.envira-lite-disabled p.envira-lite-upgrade {
-    color: #dd3d36;
-}s
 
 .envira-gallery-gallery {
-	padding-left: 7px;
+    padding-left: 7px;
 }
 
 .envira-gallery-gallery .attachment {
-	margin: 8px;
+    margin: 8px;
 }
 
 .envira-gallery-gallery .attachment-preview,
 .envira-gallery-gallery .attachment-preview .thumbnail {
-	width: 150px;
-	height: 150px;
+    width: 150px;
+    height: 150px;
 }
 
 .envira-gallery-media-frame .max-upload-size {
-	display: block;
-	margin: 1em 0;
+    display: block;
+    margin: 1em 0;
 }
 
 .envira-gallery-media-frame .envira-gallery-library-toolbar {
-	top: 5px;
+    top: 5px;
 }
 
 .envira-gallery-media-frame .attachment.envira-gallery-in-gallery {
-	box-shadow: 0 0 0 1px #fff, 0 0 0 5px #519e0c;
+    box-shadow: 0 0 0 1px #fff, 0 0 0 5px #519e0c;
 }
 
 .envira-gallery-media-frame .attachment.envira-gallery-in-gallery .attachment-preview,
 .envira-gallery-media-frame .attachment.envira-gallery-in-gallery .attachment-preview .check {
-	cursor: default;
+    cursor: default;
 }
 
 .envira-gallery-media-frame .attachment.envira-gallery-in-gallery .check {
-	box-shadow: 0 0 0 1px #519e0c;
-	background: #519e0c;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#519e0c), to(#519e0c));
-	background-image: -webkit-linear-gradient(top, #519e0c, #407f08);
-	background-image: -moz-linear-gradient(top, #519e0c, #407f08);
-	background-image: -o-linear-gradient(top, #519e0c, #407f08);
-	background-image: linear-gradient(to bottom, #519e0c, #407f08);
+    box-shadow: 0 0 0 1px #519e0c;
+    background: #519e0c;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#519e0c), to(#519e0c));
+    background-image: -webkit-linear-gradient(top, #519e0c, #407f08);
+    background-image: -moz-linear-gradient(top, #519e0c, #407f08);
+    background-image: -o-linear-gradient(top, #519e0c, #407f08);
+    background-image: linear-gradient(to bottom, #519e0c, #407f08);
 }
 
 .envira-gallery-media-frame .attachment.envira-gallery-in-gallery .check div,
 .envira-gallery-media-frame .attachment.envira-gallery-in-gallery .check:hover div {
-	background-position: -21px 0;
+    background-position: -21px 0;
 }
 
 .envira-gallery-meta-wrap .envira-gallery-meta-sidebar {
-	overflow: auto;
-	position: relative;
+    overflow: auto;
+    position: relative;
 }
 
 .envira-gallery-media-frame .media-sidebar h3 {
-	margin: 1.1em 0 1em;
+    margin: 1.1em 0 1em;
 }
 
 .envira-gallery-media-frame .media-sidebar p {
-	margin: 0 0 1.5em;
+    margin: 0 0 1.5em;
 }
 
 .envira-gallery-meta {
-	overflow: auto;
-	padding: 0 16px;
+    overflow: auto;
+    padding: 0 16px;
 }
 
 .media-frame.envira-gallery-media-frame input:focus,
 .media-frame.envira-gallery-media-frame textarea:focus,
 .media-frame.envira-gallery-media-frame select:focus {
-	border-color: #aaa;
+    border-color: #aaa;
 }
 
 .envira-gallery-meta-wrap .envira-gallery-meta.attachments {
-	top: 0;
+    top: 0;
 }
 
 .envira-gallery-ui-content {
-	top: 16px !important;
+    top: 16px !important;
 }
 
 .envira-gallery-meta-wrap .form-table {
-	margin: 0;
+    margin: 0;
 }
 
 .envira-gallery-meta-wrap .form-table input[type=text] {
@@ -321,4 +394,54 @@
     margin-bottom: 20px;
     padding-bottom: 20px;
     border-bottom: 1px solid #ddd;
+}
+
+#envira-gallery .envira-unit {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.envira-lite-disabled th,
+.envira-lite-disabled td,
+.envira-lite-disabled .description {
+    color: #aaa;
+}
+
+.envira-lite-disabled p.envira-lite-upgrade {
+    color: #dd3d36;
+}
+
+#envira-gallery textarea {
+    width: 100%;
+}
+
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (   min--moz-device-pixel-ratio: 2),
+only screen and (     -o-min-device-pixel-ratio: 2/1),
+only screen and (        min-device-pixel-ratio: 2),
+only screen and (                min-resolution: 192dpi),
+only screen and (                min-resolution: 2dppx) {
+
+    #envira-gallery .envira-meta-icon {
+        background-image: url(images/meta@2x.png);
+        background-size: 19px 16px;
+    }
+
+    #envira-gallery .envira-helper-active .envira-meta-icon {
+        background-image: url(images/meta-active@2x.png);
+        background-size: 19px 16px;
+    }
+
+    #envira-gallery #envira-gallery-output li .envira-gallery-remove-image {
+        background-image: url(images/delete@2x.png);
+        background-size: 16px 16px;
+    }
+
+    #envira-gallery #envira-gallery-output li .envira-gallery-modify-image {
+        background-image: url(images/modify@2x.png);
+        background-size: 16px 16px;
+    }
+
 }

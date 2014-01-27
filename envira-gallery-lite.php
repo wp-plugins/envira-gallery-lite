@@ -358,7 +358,7 @@ class Envira_Gallery_Lite {
         $number = 5 - (int) $this->number;
         ?>
         <div class="updated below-h2">
-            <p><?php printf( __( 'You have <strong>%s galleries</strong> remaining to be created in the lite version before you have reached your limit. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), (int) $number, 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
+            <p><?php printf( __( 'You have <strong>%s galleries</strong> remaining to be created in the Lite version before you have reached your limit. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), (int) $number, 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
         </div>
         <?php
 
@@ -376,9 +376,9 @@ class Envira_Gallery_Lite {
         ?>
         <div class="error below-h2">
             <?php if ( $can_edit ) : ?>
-            <p><?php printf( __( 'You have reached your limit of <strong>5 galleries</strong> for the lite version of Envira Gallery. <strong>You can still use this existing gallery.</strong> To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
+            <p><?php printf( __( 'You have reached your limit of <strong>5 galleries</strong> for the Lite version of Envira Gallery. <strong>You can still use this existing gallery.</strong> To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
             <?php else : ?>
-            <p><?php printf( __( 'You have reached your limit of <strong>5 galleries</strong> for the lite version of Envira Gallery. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
+            <p><?php printf( __( 'You have reached your limit of <strong>5 galleries</strong> for the Lite version of Envira Gallery. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
             <?php endif; ?>
         </div>
         <?php

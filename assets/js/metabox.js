@@ -34,39 +34,42 @@
             envira_progress = $('#envira-gallery .envira-progress-bar div'),
             envira_output   = $('#envira-gallery-output');
 
-        // Bind to the FilesAdded event to show the progess bar.
-        envira_uploader.bind('FilesAdded', function(){
-            $(envira_bar).show().css('display', 'block');
-        });
+        // Only move forward if the uploader is present.
+        if ( envira_uploader ) {
+            // Bind to the FilesAdded event to show the progess bar.
+            envira_uploader.bind('FilesAdded', function(){
+                $(envira_bar).show().css('display', 'block');
+            });
 
-        // Bind to the UploadProgress event to manipulate the progress bar.
-        envira_uploader.bind('UploadProgress', function(up, file){
-            $(envira_progress).css('width', up.total.percent + '%');
-        });
+            // Bind to the UploadProgress event to manipulate the progress bar.
+            envira_uploader.bind('UploadProgress', function(up, file){
+                $(envira_progress).css('width', up.total.percent + '%');
+            });
 
-        // Bind to the FileUploaded event to set proper UI display for gallery.
-        envira_uploader.bind('FileUploaded', function(up, file, info){
-            // Make an ajax request to generate and output the image in the gallery UI.
-            $.post(
-                envira_gallery_metabox.ajax,
-                {
-                    action:  'envira_gallery_load_image',
-                    nonce:   envira_gallery_metabox.load_image,
-                    id:      info.response,
-                    post_id: envira_gallery_metabox.id
-                },
-                function(res){
-                    $(envira_output).append(res);
-                },
-                'json'
-            );
-        });
+            // Bind to the FileUploaded event to set proper UI display for gallery.
+            envira_uploader.bind('FileUploaded', function(up, file, info){
+                // Make an ajax request to generate and output the image in the gallery UI.
+                $.post(
+                    envira_gallery_metabox.ajax,
+                    {
+                        action:  'envira_gallery_load_image',
+                        nonce:   envira_gallery_metabox.load_image,
+                        id:      info.response,
+                        post_id: envira_gallery_metabox.id
+                    },
+                    function(res){
+                        $(envira_output).append(res);
+                    },
+                    'json'
+                );
+            });
 
-        // Bind to the UploadComplete event to hide and reset the progress bar.
-        envira_uploader.bind('UploadComplete', function(){
-            $(envira_bar).hide().css('display', 'none');
-            $(envira_progress).removeAttr('style');
-        });
+            // Bind to the UploadComplete event to hide and reset the progress bar.
+            envira_uploader.bind('UploadComplete', function(){
+                $(envira_bar).hide().css('display', 'none');
+                $(envira_progress).removeAttr('style');
+            });
+        }
 
         // Apply hiding updates to settings not available in the Lite version.
         $('.envira-lite-disabled input, .envira-lite-disabled select, .envira-lite-disabled option, .envira-lite-disabled textarea').each(function(i, el){

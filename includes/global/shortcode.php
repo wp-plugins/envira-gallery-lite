@@ -82,9 +82,6 @@ class Envira_Gallery_Shortcode_Lite {
         foreach ( $instance->get_gallery_themes() as $array => $data )
             wp_register_style( $this->base->plugin_slug . '-' . $data['value'] . '-theme', plugins_url( 'assets/css/themes/' . $data['value'] . '-skin/skin.css', $data['file'] ), array( $this->base->plugin_slug . '-style' ), $this->base->version );
 
-        foreach ( $instance->get_lightbox_themes() as $array => $data )
-            wp_register_style( $this->base->plugin_slug . '-' . $data['value'] . '-theme', plugins_url( 'assets/css/themes/' . $data['value'] . '-skin/skin.css', $data['file'] ), array( $this->base->plugin_slug . '-style' ), $this->base->version );
-
         // Register main init script and lightbox script.
         wp_register_script( $this->base->plugin_slug . '-script', plugins_url( 'assets/js/envira.js', $this->base->file ), array( 'jquery' ), $this->base->version, true );
         wp_register_script( $this->base->plugin_slug . '-lightbox', plugins_url( 'assets/js/envira-lightbox.js', $this->base->file ), array( 'jquery', $this->base->plugin_slug . '-script' ), $this->base->version, true );
@@ -140,8 +137,7 @@ class Envira_Gallery_Shortcode_Lite {
         if ( 'base' !== $this->get_config( 'gallery_theme', $data ) )
             wp_enqueue_style( $this->base->plugin_slug . '-' . $this->get_config( 'gallery_theme', $data ) . '-theme' );
 
-        // Enqueue the rest of the necessary styles.
-        wp_enqueue_style( $this->base->plugin_slug . '-' . $this->get_config( 'lightbox_theme', $data ) . '-theme' );
+        // Enqueue the rest of the necessary styles and scripts.
         wp_enqueue_script( $this->base->plugin_slug . '-script' );
         wp_enqueue_script( $this->base->plugin_slug . '-lightbox' );
 
@@ -274,31 +270,15 @@ class Envira_Gallery_Shortcode_Lite {
 
                 $('.envira-gallery-<?php echo $data['id']; ?>').fancybox({
                     <?php do_action( 'envira_gallery_api_config', $data ); ?>
-                    <?php if ( ! $this->get_config( 'keyboard', $data ) ) : ?>
-                    keys: 0,
-                    <?php endif; ?>
-                    arrows: <?php echo $this->get_config( 'arrows', $data ); ?>,
-                    mouseWheel: <?php echo $this->get_config( 'mousewheel', $data ); ?>,
-                    helpers: {
-                        <?php if ( $this->get_config( 'thumbnails', $data ) ) : ?>
-                        thumbs: {
-                            width: <?php echo $this->get_config( 'thumbnails_width', $data ); ?>,
-                            height: <?php echo $this->get_config( 'thumbnails_height', $data ); ?>,
-                            source: function(current) {
-                                return $(current.element).data('thumbnail');
-                            }
-                        }
-                        <?php endif; ?>
-                    },
-                    beforeShow: function(){
+                    cyclic: true,
+                    centerOnScroll: true,
+                    onStart: function(){
                         $(window).on({
-                            'resize.fancybox' : function(){
-                                $.fancybox.update();
+                            'resize' : function(){
+                                $.fancybox.resize();
+                                $.fancybox.center();
                             }
                         });
-                    },
-                    afterClose: function(){
-                        $(window).off('resize.fancybox');
                     }
                 });
             <?php do_action( 'envira_gallery_api_end', $data ); endforeach;

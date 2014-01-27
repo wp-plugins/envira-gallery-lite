@@ -120,43 +120,69 @@ class Envira_Gallery_Common_Lite {
 
         $themes = array(
             array(
-                'value' => 'dark',
-                'name'  => __( 'Fanfare', 'envira-gallery' ),
+                'value' => 'base',
+                'name'  => __( 'Base', 'envira-gallery' ),
                 'file'  => $this->base->file
             ),
-            array(
-                'value' => 'light',
-                'name'  => __( 'Twilight', 'envira-gallery' ),
-                'file'  => $this->base->file
-            ),
-            array(
-                'value' => 'party',
-                'name'  => __( 'Parade', 'envira-gallery' ),
-                'file'  => $this->base->file
-            ),
-            array(
-                'value' => 'smooth',
-                'name'  => __( 'Sheen', 'envira-gallery' ),
-                'file'  => $this->base->file
-            ),
-            array(
-                'value' => 'metro-black',
-                'name'  => __( 'Metro Black', 'envira-gallery' ),
-                'file'  => $this->base->file
-            ),
-            array(
-                'value' => 'metro-white',
-                'name'  => __( 'Metro White', 'envira-gallery' ),
-                'file'  => $this->base->file
-            ),
-            array(
-                'value' => 'mac',
-                'name'  => __( 'Cutline', 'envira-gallery' ),
-                'file'  => $this->base->file
-            )
         );
 
         return apply_filters( 'envira_gallery_lightbox_themes', $themes );
+
+    }
+
+    /**
+     * Helper method for retrieving title displays.
+     *
+     * @since 1.0.0
+     *
+     * @return array Array of title display data.
+     */
+    public function get_title_displays() {
+
+        $displays = array(
+            array(
+                'value' => 'float',
+                'name'  => __( 'Float', 'envira-gallery' )
+            ),
+            array(
+                'value' => 'inside',
+                'name'  => __( 'Inside', 'envira-gallery' )
+            ),
+            array(
+                'value' => 'outside',
+                'name'  => __( 'Outside', 'envira-gallery' )
+            ),
+            array(
+                'value' => 'over',
+                'name'  => __( 'Over', 'envira-gallery' )
+            )
+        );
+
+        return apply_filters( 'envira_gallery_title_displays', $displays );
+
+    }
+
+    /**
+     * Helper method for retrieving toolbar positions.
+     *
+     * @since 1.0.0
+     *
+     * @return array Array of toolbar position data.
+     */
+    public function get_toolbar_positions() {
+
+        $positions = array(
+            array(
+                'value' => 'top',
+                'name'  => __( 'Top', 'envira-gallery' )
+            ),
+            array(
+                'value' => 'bottom',
+                'name'  => __( 'Bottom', 'envira-gallery' )
+            )
+        );
+
+        return apply_filters( 'envira_gallery_toolbar_positions', $positions );
 
     }
 
@@ -169,18 +195,18 @@ class Envira_Gallery_Common_Lite {
      */
     public function get_thumbnail_positions() {
 
-        $columns = array(
-            array(
-                'value' => 'bottom',
-                'name'  => __( 'Bottom', 'envira-gallery' )
-            ),
+        $positions = array(
             array(
                 'value' => 'top',
                 'name'  => __( 'Top', 'envira-gallery' )
+            ),
+            array(
+                'value' => 'bottom',
+                'name'  => __( 'Bottom', 'envira-gallery' )
             )
         );
 
-        return apply_filters( 'envira_gallery_thumbnail_positions', $columns );
+        return apply_filters( 'envira_gallery_thumbnail_positions', $positions );
 
     }
 
@@ -205,7 +231,7 @@ class Envira_Gallery_Common_Lite {
         $defaults = array(
             'columns'             => '1',
             'gallery_theme'       => 'base',
-            'lightbox_theme'      => 'dark',
+            'lightbox_theme'      => 'base',
             'gutter'              => 10,
             'margin'              => 10,
             'crop'                => 0,
@@ -214,11 +240,15 @@ class Envira_Gallery_Common_Lite {
             'mobile'              => 0,
             'mobile_width'        => 600,
             'mobile_height'       => 200,
-            'toolbar'             => 0,
+            'title_display'       => 'float',
             'arrows'              => 1,
             'keyboard'            => 1,
             'mousewheel'          => 1,
-            'thumbnails'          => 1,
+            'aspect'              => 1,
+            'toolbar'             => 0,
+            'toolbar_position'    => 'top',
+            'loop'                => 1,
+            'thumbnails'          => 0,
             'thumbnails_width'    => 75,
             'thumbnails_height'   => 50,
             'thumbnails_position' => 'bottom',

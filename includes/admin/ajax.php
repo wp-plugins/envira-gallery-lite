@@ -289,12 +289,8 @@ function envira_gallery_lite_ajax_save_meta() {
     $meta         = $_POST['meta'];
     $gallery_data = get_post_meta( $post_id, '_eg_gallery_data', true );
 
-    // Modify the meta for the image in the gallery.
-    if ( isset( $meta['caption'] ) )
-        $gallery_data['gallery'][$attach_id]['caption'] = trim( $meta['caption'] );
-
     if ( isset( $meta['title'] ) )
-        $gallery_data['gallery'][$attach_id]['title'] = trim( $meta['title'] );
+        $gallery_data['gallery'][$attach_id]['title'] = trim( wpautop( wptexturize( $meta['title'] ) ) );
 
     if ( isset( $meta['alt'] ) )
         $gallery_data['gallery'][$attach_id]['alt'] = trim( esc_html( $meta['alt'] ) );
@@ -382,7 +378,6 @@ function envira_gallery_lite_ajax_prepare_gallery_data( $gallery_data, $id ) {
         'status'  => 'pending',
         'src'     => isset( $url[0] ) ? esc_url( $url[0] ) : '',
         'title'   => get_the_title( $id ),
-        'caption' => isset( $attachment->post_excerpt ) ? $attachment->post_excerpt : '',
         'link'    => isset( $url[0] ) ? esc_url( $url[0] ) : '',
         'alt'     => ! empty( $alt_text ) ? $alt_text : '',
         'thumb'   => ''

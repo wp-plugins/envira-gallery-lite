@@ -76,15 +76,8 @@ class Envira_Gallery_Shortcode_Lite {
         // Register main gallery style.
         wp_register_style( $this->base->plugin_slug . '-style', plugins_url( 'assets/css/envira.css', $this->base->file ), array(), $this->base->version );
 
-        // Register gallery and lightbox themes.
-        $instance = Envira_Gallery_Common_Lite::get_instance();
-
-        foreach ( $instance->get_gallery_themes() as $array => $data )
-            wp_register_style( $this->base->plugin_slug . '-' . $data['value'] . '-theme', plugins_url( 'assets/css/themes/' . $data['value'] . '-skin/skin.css', $data['file'] ), array( $this->base->plugin_slug . '-style' ), $this->base->version );
-
-        // Register main init script and lightbox script.
+        // Register main gallery script.
         wp_register_script( $this->base->plugin_slug . '-script', plugins_url( 'assets/js/envira.js', $this->base->file ), array( 'jquery' ), $this->base->version, true );
-        wp_register_script( $this->base->plugin_slug . '-lightbox', plugins_url( 'assets/js/envira-lightbox.js', $this->base->file ), array( 'jquery', $this->base->plugin_slug . '-script' ), $this->base->version, true );
 
         // Load hooks and filters.
         add_shortcode( 'envira-gallery', array( $this, 'shortcode' ) );
@@ -132,14 +125,7 @@ class Envira_Gallery_Shortcode_Lite {
 
         // Load scripts and styles.
         wp_enqueue_style( $this->base->plugin_slug . '-style' );
-
-        // If the base theme is not the gallery theme, load it in.
-        if ( 'base' !== $this->get_config( 'gallery_theme', $data ) )
-            wp_enqueue_style( $this->base->plugin_slug . '-' . $this->get_config( 'gallery_theme', $data ) . '-theme' );
-
-        // Enqueue the rest of the necessary styles and scripts.
         wp_enqueue_script( $this->base->plugin_slug . '-script' );
-        wp_enqueue_script( $this->base->plugin_slug . '-lightbox' );
 
         // Load gallery init code in the footer.
         add_action( 'wp_footer', array( $this, 'gallery_init' ), 1000 );
@@ -149,10 +135,6 @@ class Envira_Gallery_Shortcode_Lite {
 
         // Apply a filter before starting the gallery HTML.
         $gallery = apply_filters( 'envira_gallery_output_start', $gallery, $data );
-
-        // If mobile is set, add the filter to add in a mobile src attribute.
-        if ( $this->get_config( 'mobile', $data ) )
-            add_filter( 'envira_gallery_output_image_attr', array( $this, 'mobile_image' ), 999, 4 );
 
         // Build out the gallery HTML.
         $gallery .= '<div id="envira-gallery-wrap-' . sanitize_html_class( $data['id'] ) . '" class="' . $this->get_gallery_classes( $data ) . '">';
@@ -239,12 +221,12 @@ class Envira_Gallery_Shortcode_Lite {
                         enviraApplyIsotope<?php echo $data['id']; ?>();
 
                         // If loading in the last image, don't throttle the reLayout method - just do it.
-                        if ( (i + 1) === envira_holder_<?php echo $data['id']; ?>.length )
+                        if ( (i + 1) === envira_holder_<?php echo $data['id']; ?>.length ) {
                             envira_container_<?php echo $data['id']; ?>.isotope('reLayout');
+                            envira_container_<?php echo $data['id']; ?>.parent().css('background-image', 'none');
+                        }
                     });
                 }
-
-                envira_container_<?php echo $data['id']; ?>.parent().css('background-image', 'none');
 
                 <?php do_action( 'envira_gallery_api_preload', $data ); ?>
 
@@ -252,7 +234,7 @@ class Envira_Gallery_Shortcode_Lite {
 
                 <?php do_action( 'envira_gallery_api_isotope', $data ); ?>
 
-                $(window).resize(function() {
+                $(window).smartresize(function() {
                     enviraSetWidths(envira_container_<?php echo $data['id']; ?>, <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>);
                     envira_container_<?php echo $data['id']; ?>.isotope({
                         masonry: {
@@ -284,9 +266,10 @@ class Envira_Gallery_Shortcode_Lite {
             <?php do_action( 'envira_gallery_api_end', $data ); endforeach;
 
             // Minify before outputting to improve page load time.
+            do_action( 'envira_gallery_api_end_global' );
             $clean = preg_replace( '/((?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:\/\/.*))/', '', ob_get_clean() );
             $clean = str_replace( array( "\r\n", "\r", "\t", "\n", '  ', '    ', '     ' ), '', $clean );
-            echo $clean; do_action( 'envira_gallery_api_end_global' ); ?>});</script>
+            echo $clean; ?>});</script>
         <?php
 
     }
@@ -366,24 +349,6 @@ class Envira_Gallery_Shortcode_Lite {
         } else {
             return apply_filters( 'envira_gallery_image_src', $image[0], $id, $item, $data );
         }
-
-    }
-
-    /**
-     * Helper method for retrieving the mobile image src attribute.
-     *
-     * @since 1.0.0
-     *
-     * @param string $attr  String of image attributes.
-     * @param int $id       The ID of the image attachment.
-     * @param array $item   The array of date for the image.
-     * @param array $data   Array of gallery data.
-     * @return string $attr Amended string of image attributes.
-     */
-    public function mobile_image( $attr, $id, $item, $data ) {
-
-        $mobile_image = $this->get_image_src( $id, $item, $data, true );
-        return $attr . ' data-envira-src-mobile="' . esc_url( $mobile_image ) . '"';
 
     }
 

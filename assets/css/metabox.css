@@ -23,6 +23,10 @@
 	zoom: 1;
 }
 
+#envira-gallery p.description {
+    font-size: 13px;
+}
+
 #envira-gallery .inside {
     margin: 10px 0;
     padding: 0 10px;

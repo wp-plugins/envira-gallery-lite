@@ -79,25 +79,8 @@
             $('<p class="envira-lite-upgrade">' + envira_gallery_metabox.upgrade + '</p>' + envira_gallery_metabox.upgrade_btn).appendTo($(this));
         });
 
-        // Conditionally show the cropping/mobile image sizes if the option is selected.
-        var envira_crop_option   = $('#envira-config-crop'),
-            envira_mobile_option = $('#envira-config-mobile');
-        if ( envira_crop_option.is(':checked') )
-            $('#envira-config-crop-size-box').fadeIn(300);
-        envira_crop_option.on('change', function(){
-            if ( $(this).is(':checked') )
-               $('#envira-config-crop-size-box').fadeIn(300);
-            else
-                $('#envira-config-crop-size-box').fadeOut(300);
-        });
-        if ( envira_mobile_option.is(':checked') )
-            $('#envira-config-mobile-size-box').fadeIn(300);
-        envira_mobile_option.on('change', function(){
-            if ( $(this).is(':checked') )
-               $('#envira-config-mobile-size-box').fadeIn(300);
-            else
-                $('#envira-config-mobile-size-box').fadeOut(300);
-        });
+        // Conditionally show necessary fields.
+        enviraConditionals();
 
         // Open up the media manager modal.
         $(document).on('click', '.envira-media-library', function(e){
@@ -123,7 +106,7 @@
         $('.envira-gallery-load-library').on('click', function(e){
             e.preventDefault();
             var $this = $(this);
-            $this.after('<span class="envira-gallery-waiting" style="display: inline-block; margin-top: 16px;"><img class="envira-gallery-spinner" src="' + envira_gallery_metabox.spinner + '" width="16px" height="16px" style="margin: -1px 5px 0; vertical-align: middle;" />' + envira_gallery_metabox.loading + '</span>');
+            $this.next().css({'display' : 'inline-block', 'margin-top' : '14px', 'margin-left' : '-5px'});
 
             // Prepare our data to be sent via Ajax.
             var load = {
@@ -148,10 +131,8 @@
                         $('.envira-gallery-gallery').append(response.html);
                     }
 
-                    // Remove the spinner and loading message/
-                    $('.envira-gallery-waiting').fadeOut('normal', function() {
-                        $(this).remove();
-                    });
+                    // Remove the spinner.
+                    $this.next().hide();
                 },
                 'json'
             );
@@ -160,9 +141,7 @@
         // Load images related to the search term specified
         $(document).on('keyup keydown', '#envira-gallery-gallery-search', function(){
             var $this = $(this);
-            // Ensure loading icon has been removed before outputting again.
-            $('.envira-waiting').remove();
-            $this.before('<span class="envira-waiting" style="display: inline-block; margin-top: 16px; margin-right: 10px;"><img class="envira-spinner" src="' + envira_gallery_metabox.spinner + '" width="16px" height="16px" style="margin: -1px 5px 0; vertical-align: middle;" />' + envira_gallery_metabox.searching + '</span>');
+            $this.prev().css({'display' : 'inline-block', 'margin-top' : '1px', 'vertical-align' : 'middle', 'margin-right' : '4px'});
 
             var text        = $(this).val();
             var search      = {
@@ -186,10 +165,8 @@
                         if ( response )
                             $('.envira-gallery-gallery').html(response.html);
 
-                        // Remove the spinner and loading message.
-                        $('.envira-waiting').fadeOut('normal', function() {
-                            $(this).remove();
-                        });
+                        // Remove the spinner.
+                        $this.prev().hide();
                     },
                     'json'
                 );
@@ -341,8 +318,8 @@
             // Output saving text...
             $this.text(envira_gallery_metabox.saving);
 
-            // Add the caption since it is a special field.
-            meta.caption = $('#envira-gallery-meta-table-' + attach_id).find('textarea[name="_envira_gallery[meta_caption]"]').val();
+            // Add the title since it is a special field.
+            meta.title = $('#envira-gallery-meta-table-' + attach_id).find('textarea[name="_envira_gallery[meta_title]"]').val();
 
             // Get all meta fields and values.
             $('#envira-gallery-meta-table-' + attach_id).find(':input').not('.ed_button').each(function(i, el){
@@ -374,7 +351,12 @@
 
         // Append spinner when importing a gallery.
         $('#envira-gallery-import-submit').on('click', function(){
-            $(this).after('<span class="envira-gallery-waiting" style="display: inline-block;"><img class="envira-gallery-spinner" src="' + envira_gallery_metabox.spinner + '" width="16px" height="16px" style="margin: -1px 5px 0; vertical-align: middle;" />');
+            $(this).next().css('display', 'inline-block');
+            if ( $('#envira-config-import-gallery').val().length === 0 ) {
+                e.preventDefault();
+                $(this).next().hide();
+                alert(envira_gallery_metabox.import);
+            }
         });
 
         // Polling function for typing and other user centric items.
@@ -408,7 +390,8 @@
                 nonce:  envira_gallery_metabox.refresh_nonce
             };
 
-            $('.envira-media-library').after('<span class="envira-gallery-waiting" style="display: inline-block;"><img class="envira-gallery-spinner" src="' + envira_gallery_metabox.spinner + '" width="16px" height="16px" style="margin: -1px 5px 0; vertical-align: middle;" />' + envira_gallery_metabox.refreshing + '</span>');
+            $('.envira-media-library').after('<span class="spinner envira-gallery-spinner envira-gallery-spinner-refresh"></span>');
+            $('.envira-gallery-spinner-refresh').css({'display' : 'inline-block', 'margin-top' : '-3px'});
 
             $.post(
                 envira_gallery_metabox.ajax,
@@ -418,7 +401,7 @@
                         $('#envira-gallery-output').html(res.success);
                         $('#envira-gallery-output').find('.wp-editor-wrap').each(function(i, el){
                             var id = $(el).attr('id').split('-')[4];
-                            quicktags({id: 'envira-gallery-caption-' + id, buttons: 'strong,em,link,block,del,ins,img,ul,ol,li,code,close'});
+                            quicktags({id: 'envira-gallery-caption-' + id, buttons: 'strong,em,link,ul,ol,li,close'});
                             QTags._buttonsInit(); // Force buttons to initialize.
                         });
 
@@ -426,12 +409,44 @@
                         $('#envira-gallery-output').trigger({ type: 'enviraRefreshed', html: res.success, id: envira_gallery_metabox.id });
                     }
 
-                    $('.envira-gallery-waiting').fadeOut(300, function(){
+                    // Remove the spinner.
+                    $('.envira-gallery-spinner-refresh').fadeOut(300, function(){
                         $(this).remove();
                     });
                 },
                 'json'
             );
+        }
+
+        // Function to show conditional fields.
+        function enviraConditionals() {
+            var envira_crop_option    = $('#envira-config-crop'),
+                envira_mobile_option  = $('#envira-config-mobile'),
+                envira_toolbar_option = $('#envira-config-lightbox-toolbar');
+            if ( envira_crop_option.is(':checked') )
+                $('#envira-config-crop-size-box').fadeIn(300);
+            envira_crop_option.on('change', function(){
+                if ( $(this).is(':checked') )
+                    $('#envira-config-crop-size-box').fadeIn(300);
+                else
+                    $('#envira-config-crop-size-box').fadeOut(300);
+            });
+            if ( envira_mobile_option.is(':checked') )
+                $('#envira-config-mobile-size-box').fadeIn(300);
+            envira_mobile_option.on('change', function(){
+                if ( $(this).is(':checked') )
+                    $('#envira-config-mobile-size-box').fadeIn(300);
+                else
+                    $('#envira-config-mobile-size-box').fadeOut(300);
+            });
+            if ( envira_toolbar_option.is(':checked') )
+                $('#envira-config-lightbox-toolbar-position-box').fadeIn(300);
+            envira_toolbar_option.on('change', function(){
+                if ( $(this).is(':checked') )
+                    $('#envira-config-lightbox-toolbar-position-box').fadeIn(300);
+                else
+                    $('#envira-config-lightbox-toolbar-position-box').fadeOut(300);
+            });
         }
     });
 }(jQuery));

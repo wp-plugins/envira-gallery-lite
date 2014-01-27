@@ -1,4 +1,4 @@
 envira-gallery-lite
-===================
+==============
 
-Lite version of Envira Gallery.
+Envira Gallery is the best responsive WordPress gallery plugin.

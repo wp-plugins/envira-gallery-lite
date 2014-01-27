@@ -1,0 +1,445 @@
+<?php
+/**
+ * Shortcode class.
+ *
+ * @since 1.0.0
+ *
+ * @package Envira_Gallery_Lite
+ * @author  Thomas Griffin
+ */
+class Envira_Gallery_Shortcode_Lite {
+
+    /**
+     * Holds the class object.
+     *
+     * @since 1.0.0
+     *
+     * @var object
+     */
+    public static $instance;
+
+    /**
+     * Path to the file.
+     *
+     * @since 1.0.0
+     *
+     * @var string
+     */
+    public $file = __FILE__;
+
+    /**
+     * Holds the base class object.
+     *
+     * @since 1.0.0
+     *
+     * @var object
+     */
+    public $base;
+
+    /**
+     * Holds the gallery data.
+     *
+     * @since 1.0.0
+     *
+     * @var array
+     */
+    public $data;
+
+    /**
+     * Holds gallery IDs for init firing checks.
+     *
+     * @since 1.0.0
+     *
+     * @var array
+     */
+    public $done = array();
+
+    /**
+     * Iterator for galleries on the page.
+     *
+     * @since 1.0.0
+     *
+     * @var int
+     */
+    public $counter = 1;
+
+    /**
+     * Primary class constructor.
+     *
+     * @since 1.0.0
+     */
+    public function __construct() {
+
+        // Load the base class object.
+        $this->base = Envira_Gallery_Lite::get_instance();
+
+        // Register main gallery style.
+        wp_register_style( $this->base->plugin_slug . '-style', plugins_url( 'assets/css/envira.css', $this->base->file ), array(), $this->base->version );
+
+        // Register gallery and lightbox themes.
+        $instance = Envira_Gallery_Common_Lite::get_instance();
+
+        foreach ( $instance->get_gallery_themes() as $array => $data )
+            wp_register_style( $this->base->plugin_slug . '-' . $data['value'] . '-theme', plugins_url( 'assets/css/themes/' . $data['value'] . '-skin/skin.css', $data['file'] ), array( $this->base->plugin_slug . '-style' ), $this->base->version );
+
+        foreach ( $instance->get_lightbox_themes() as $array => $data )
+            wp_register_style( $this->base->plugin_slug . '-' . $data['value'] . '-theme', plugins_url( 'assets/css/themes/' . $data['value'] . '-skin/skin.css', $data['file'] ), array( $this->base->plugin_slug . '-style' ), $this->base->version );
+
+        // Register main init script and lightbox script.
+        wp_register_script( $this->base->plugin_slug . '-script', plugins_url( 'assets/js/envira.js', $this->base->file ), array( 'jquery' ), $this->base->version, true );
+        wp_register_script( $this->base->plugin_slug . '-lightbox', plugins_url( 'assets/js/envira-lightbox.js', $this->base->file ), array( 'jquery', $this->base->plugin_slug . '-script' ), $this->base->version, true );
+
+        // Load hooks and filters.
+        add_shortcode( 'envira-gallery', array( $this, 'shortcode' ) );
+
+    }
+
+    /**
+     * Creates the shortcode for the plugin.
+     *
+     * @since 1.0.0
+     *
+     * @global object $post The current post object.
+     *
+     * @param array $atts Array of shortcode attributes.
+     * @return string The gallery output.
+     */
+    public function shortcode( $atts ) {
+
+        global $post;
+
+        // If no attributes have been passed, the gallery should be pulled from the current post.
+        $gallery_id = false;
+        if ( empty( $atts ) ) {
+            $gallery_id = $post->ID;
+            $data       = $this->base->get_gallery( $gallery_id );
+        } else if ( isset( $atts['id'] ) ) {
+            $gallery_id = $atts['id'];
+            $data       = $this->base->get_gallery( $gallery_id );
+        } else if ( isset( $atts['slug'] ) ) {
+            $gallery_id = $atts['slug'];
+            $data       = $this->base->get_gallery_by_slug( $gallery_id );
+        }
+
+        // If there is no data to output or the gallery is inactive, do nothing.
+        if ( ! $data || empty( $data['gallery'] ) || isset( $data['status'] ) && 'inactive' == $data['status'] )
+            return;
+
+        // Allow the data to be filtered before it is stored and used to create the gallery output.
+        $data = apply_filters( 'envira_gallery_pre_data', $data, $gallery_id );
+
+        // Prepare variables.
+        $this->data[] = $data;
+        $gallery      = '';
+        $i            = 1;
+
+        // Load scripts and styles.
+        wp_enqueue_style( $this->base->plugin_slug . '-style' );
+
+        // If the base theme is not the gallery theme, load it in.
+        if ( 'base' !== $this->get_config( 'gallery_theme', $data ) )
+            wp_enqueue_style( $this->base->plugin_slug . '-' . $this->get_config( 'gallery_theme', $data ) . '-theme' );
+
+        // Enqueue the rest of the necessary styles.
+        wp_enqueue_style( $this->base->plugin_slug . '-' . $this->get_config( 'lightbox_theme', $data ) . '-theme' );
+        wp_enqueue_script( $this->base->plugin_slug . '-script' );
+        wp_enqueue_script( $this->base->plugin_slug . '-lightbox' );
+
+        // Load gallery init code in the footer.
+        add_action( 'wp_footer', array( $this, 'gallery_init' ), 1000 );
+
+        // Run a hook before the gallery output begins but after scripts and inits have been set.
+        do_action( 'envira_gallery_before_output', $data );
+
+        // Apply a filter before starting the gallery HTML.
+        $gallery = apply_filters( 'envira_gallery_output_start', $gallery, $data );
+
+        // If mobile is set, add the filter to add in a mobile src attribute.
+        if ( $this->get_config( 'mobile', $data ) )
+            add_filter( 'envira_gallery_output_image_attr', array( $this, 'mobile_image' ), 999, 4 );
+
+        // Build out the gallery HTML.
+        $gallery .= '<div id="envira-gallery-wrap-' . sanitize_html_class( $data['id'] ) . '" class="' . $this->get_gallery_classes( $data ) . '">';
+            $gallery  = apply_filters( 'envira_gallery_output_before_container', $gallery, $data );
+            $gallery .= '<div id="envira-gallery-' . sanitize_html_class( $data['id'] ) . '" class="envira-gallery-public envira-gallery-' . sanitize_html_class( $this->get_config( 'columns', $data ) ) . '-columns envira-clear isotope" data-envira-columns="' . $this->get_config( 'columns', $data ) . '">';
+                foreach ( $data['gallery'] as $id => $item ) :
+                    // Skip over images that are pending (ignore if in Preview mode).
+                    if ( isset( $item['status'] ) && 'pending' == $item['status'] && ! is_preview() )
+                        continue;
+
+                    $imagesrc = $this->get_image_src( $id, $item, $data );
+                    $gallery  = apply_filters( 'envira_gallery_output_before_item', $gallery, $id, $item, $data, $i );
+                    $gallery .= '<div id="envira-gallery-item-' . sanitize_html_class( $id ) . '" class="envira-gallery-item isotope-item" style="margin-bottom: ' . $this->get_config( 'margin', $data ) . 'px;">';
+                        $gallery  = apply_filters( 'envira_gallery_output_before_link', $gallery, $id, $item, $data, $i );
+                        $gallery .= '<a href="' . esc_url( $item['link'] ) . '" class="envira-gallery-' . sanitize_html_class( $data['id'] ) . ' envira-gallery-link" rel="enviragallery' . sanitize_html_class( $data['id'] ) . '" title="' . esc_attr( $item['title'] ) . '" data-caption="' . $item['caption'] . '" data-thumbnail="' . esc_url( $item['thumb'] ) . '">';
+                            $gallery  = apply_filters( 'envira_gallery_output_before_image', $gallery, $id, $item, $data, $i );
+                            $gallery .= '<img id="envira-gallery-image-' . sanitize_html_class( $id ) . '" class="envira-gallery-image envira-gallery-preload envira-gallery-image-' . $i . '" src="' . esc_url( plugins_url( 'assets/css/images/holder.gif', dirname( dirname( __FILE__ ) ) ) ) . '" data-envira-src="' . esc_url( $imagesrc ) . '" alt="' . esc_attr( $item['title'] ) . '" ' . apply_filters( 'envira_gallery_output_image_attr', '', $id, $item, $data, $i ) . ' />';
+                            $gallery  = apply_filters( 'envira_gallery_output_after_image', $gallery, $id, $item, $data, $i );
+                        $gallery .= '</a>';
+                        $gallery  = apply_filters( 'envira_gallery_output_after_link', $gallery, $id, $item, $data, $i );
+                    $gallery .= '</div>';
+                    $gallery  = apply_filters( 'envira_gallery_output_after_item', $gallery, $id, $item, $data, $i );
+                $i++; endforeach;
+            $gallery .= '</div>';
+            $gallery  = apply_filters( 'envira_gallery_output_after_container', $gallery, $data );
+        $gallery .= '</div>';
+        $gallery  = apply_filters( 'envira_gallery_output_end', $gallery, $data );
+
+        // Increment the counter.
+        $this->counter++;
+
+        // Return the gallery HTML.
+        return apply_filters( 'envira_gallery_output', $gallery, $data );
+
+    }
+
+    /**
+     * Outputs the gallery init script in the footer.
+     *
+     * @since 1.0.0
+     */
+    public function gallery_init() {
+
+        ?>
+        <script type="text/javascript">jQuery(document).ready(function($){<?php ob_start();
+            do_action( 'envira_gallery_api_start_global' );
+            foreach ( $this->data as $data ) :
+                // Prevent multiple init scripts for the same gallery ID.
+                if ( in_array( $data['id'], $this->done ) )
+                    continue;
+                $this->done[] = $data['id'];
+
+                do_action( 'envira_gallery_api_start', $data ); ?>
+
+                var envira_container_<?php echo $data['id']; ?> = $('#envira-gallery-<?php echo $data['id']; ?>'),
+                    envira_on_show_<?php echo $data['id']; ?>,
+                    envira_on_render_<?php echo $data['id']; ?>,
+                    envira_holder_<?php echo $data['id']; ?> = $('#envira-gallery-<?php echo $data['id']; ?>').find(".envira-gallery-preload");
+
+                envira_container_<?php echo $data['id']; ?>.isotope({
+                    masonry: {
+                        gutterWidth: <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>,
+                        columnWidth: enviraGetColWidth(envira_container_<?php echo $data['id']; ?>, <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>)
+                    },
+                    onLayout: function( $elems, instance ) {
+                        envira_container_<?php echo $data['id']; ?>.css('overflow', 'visible');
+                        envira_container_<?php echo $data['id']; ?>.isotope('reLayout');
+                        <?php do_action( 'envira_gallery_api_isotope_layout', $data ); ?>
+                    },
+                });
+
+                var enviraApplyIsotope<?php echo $data['id']; ?> = enviraThrottle(function(){
+                    envira_container_<?php echo $data['id']; ?>.isotope('reLayout');
+                }, 75);
+
+                if ( 0 !== envira_holder_<?php echo $data['id']; ?>.length ) {
+                    var envira_mobile = enviraIsMobile(),
+                    envira_src_attr   = envira_mobile ? 'data-envira-src-mobile' : 'data-envira-src';
+                    $.each(envira_holder_<?php echo $data['id']; ?>, function(i, el){
+                        var envira_src = $(this).attr(envira_src_attr);
+                        if ( typeof envira_src === 'undefined' || false === envira_src ) return;
+                        (new Image()).src = envira_src;
+                        $(this).attr('src', envira_src).removeAttr(envira_src_attr).css('opacity', '1');
+                        enviraApplyIsotope<?php echo $data['id']; ?>();
+
+                        // If loading in the last image, don't throttle the reLayout method - just do it.
+                        if ( (i + 1) === envira_holder_<?php echo $data['id']; ?>.length )
+                            envira_container_<?php echo $data['id']; ?>.isotope('reLayout');
+                    });
+                }
+
+                envira_container_<?php echo $data['id']; ?>.parent().css('background-image', 'none');
+
+                <?php do_action( 'envira_gallery_api_preload', $data ); ?>
+
+                enviraSetWidths(envira_container_<?php echo $data['id']; ?>, <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>);
+
+                <?php do_action( 'envira_gallery_api_isotope', $data ); ?>
+
+                $(window).resize(function() {
+                    enviraSetWidths(envira_container_<?php echo $data['id']; ?>, <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>);
+                    envira_container_<?php echo $data['id']; ?>.isotope({
+                        masonry: {
+                            gutterWidth: <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>,
+                            columnWidth: enviraGetColWidth(envira_container_<?php echo $data['id']; ?>, <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>)
+                        },
+                        onLayout: function( $elems, instance ) {
+                            envira_container_<?php echo $data['id']; ?>.css('overflow', 'visible');
+                            <?php do_action( 'envira_gallery_api_isotope_layout', $data ); ?>
+                        }
+                    });
+                });
+
+                <?php do_action( 'envira_gallery_api_lightbox', $data ); ?>
+
+                $('.envira-gallery-<?php echo $data['id']; ?>').fancybox({
+                    <?php do_action( 'envira_gallery_api_config', $data ); ?>
+                    <?php if ( ! $this->get_config( 'keyboard', $data ) ) : ?>
+                    keys: 0,
+                    <?php endif; ?>
+                    arrows: <?php echo $this->get_config( 'arrows', $data ); ?>,
+                    mouseWheel: <?php echo $this->get_config( 'mousewheel', $data ); ?>,
+                    helpers: {
+                        <?php if ( $this->get_config( 'thumbnails', $data ) ) : ?>
+                        thumbs: {
+                            width: <?php echo $this->get_config( 'thumbnails_width', $data ); ?>,
+                            height: <?php echo $this->get_config( 'thumbnails_height', $data ); ?>,
+                            source: function(current) {
+                                return $(current.element).data('thumbnail');
+                            }
+                        }
+                        <?php endif; ?>
+                    },
+                    beforeShow: function(){
+                        $(window).on({
+                            'resize.fancybox' : function(){
+                                $.fancybox.update();
+                            }
+                        });
+                    },
+                    afterClose: function(){
+                        $(window).off('resize.fancybox');
+                    }
+                });
+            <?php do_action( 'envira_gallery_api_end', $data ); endforeach;
+
+            // Minify before outputting to improve page load time.
+            $clean = preg_replace( '/((?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:\/\/.*))/', '', ob_get_clean() );
+            $clean = str_replace( array( "\r\n", "\r", "\t", "\n", '  ', '    ', '     ' ), '', $clean );
+            echo $clean; do_action( 'envira_gallery_api_end_global' ); ?>});</script>
+        <?php
+
+    }
+
+    /**
+     * Helper method for adding custom gallery classes.
+     *
+     * @since 1.0.0
+     *
+     * @param array $data The gallery data to use for retrieval.
+     * @return string     String of space separated gallery classes.
+     */
+    public function get_gallery_classes( $data ) {
+
+        // Set default class.
+        $classes   = array();
+        $classes[] = 'envira-gallery-wrap';
+
+        // Add custom class based on data provided.
+        $classes[] = 'envira-gallery-theme-' . $this->get_config( 'gallery_theme', $data );
+        $classes[] = 'envira-lightbox-theme-' . $this->get_config( 'lightbox_theme', $data );
+
+        // If we have custom classes defined for this gallery, output them now.
+        foreach ( (array) $this->get_config( 'classes', $data ) as $class )
+            $classes[] = $class;
+
+        // Allow filtering of classes and then return what's left.
+        $classes   = apply_filters( 'envira_gallery_output_classes', $classes, $data );
+        return trim( implode( ' ', array_map( 'trim', array_map( 'sanitize_html_class', array_unique( $classes ) ) ) ) );
+
+    }
+
+    /**
+     * Helper method to retrieve the proper image src attribute based on gallery settings.
+     *
+     * @since 1.0.0
+     *
+     * @param int $id      The image attachment ID to use.
+     * @param array $item  Gallery item data.
+     * @param array $data  The gallery data to use for retrieval.
+     * @param bool $mobile Whether or not to retrieve the mobile image.
+     * @return string      The proper image src attribute for the image.
+     */
+    public function get_image_src( $id, $item, $data, $mobile = false ) {
+
+        // Get the full image attachment. If it does not return the data we need, return the image link instead.
+        $image = wp_get_attachment_image_src( $id, 'full' );
+        if ( ! is_array( $image ) )
+            return apply_filters( 'envira_gallery_no_image_src', $item['link'], $id, $item, $data );
+
+        // Generate the cropped image if necessary.
+        $type = $mobile ? 'mobile' : 'crop';
+        if ( isset( $data[$type]['crop'] ) && $data[$type]['crop'] ) {
+            $common = Envira_Gallery_Common_Lite::get_instance();
+            $args   = apply_filters( 'envira_gallery_crop_image_args',
+                array(
+                    'position' => 'c',
+                    'width'    => $this->get_config( $type . '_width', $data ),
+                    'height'   => $this->get_config( $type . '_height', $data ),
+                    'quality'  => 100,
+                    'retina'   => false
+                )
+            );
+            $cropped_image = $common->resize_image( $image[0], $args['width'], $args['height'], true, $args['position'], $args['quality'], $args['retina'] );
+
+            // If there is an error, possibly output error message and return the default image src.
+            if ( is_wp_error( $cropped_image ) ) {
+                // If debugging is defined, print out the error.
+                if ( defined( 'ENVIRA_GALLERY_CROP_DEBUG' ) && ENVIRA_GALLERY_CROP_DEBUG )
+                    echo '<pre>' . var_export( $cropped_image->get_error_message(), true ) . '</pre>';
+
+                // Return the non-cropped image as a fallback.
+                return apply_filters( 'envira_gallery_image_src', $image[0], $id, $item, $data );
+            } else {
+                return apply_filters( 'envira_gallery_image_src', $cropped_image, $id, $item, $data );
+            }
+        } else {
+            return apply_filters( 'envira_gallery_image_src', $image[0], $id, $item, $data );
+        }
+
+    }
+
+    /**
+     * Helper method for retrieving the mobile image src attribute.
+     *
+     * @since 1.0.0
+     *
+     * @param string $attr  String of image attributes.
+     * @param int $id       The ID of the image attachment.
+     * @param array $item   The array of date for the image.
+     * @param array $data   Array of gallery data.
+     * @return string $attr Amended string of image attributes.
+     */
+    public function mobile_image( $attr, $id, $item, $data ) {
+
+        $mobile_image = $this->get_image_src( $id, $item, $data, true );
+        return $attr . ' data-envira-src-mobile="' . esc_url( $mobile_image ) . '"';
+
+    }
+
+    /**
+     * Helper method for retrieving config values.
+     *
+     * @since 1.0.0
+     *
+     * @param string $key The config key to retrieve.
+     * @param array $data The gallery data to use for retrieval.
+     * @return string     Key value on success, default if not set.
+     */
+    public function get_config( $key, $data ) {
+
+        $instance = Envira_Gallery_Common_Lite::get_instance();
+        return isset( $data['config'][$key] ) ? $data['config'][$key] : $instance->get_config_default( $key );
+
+    }
+
+    /**
+     * Returns the singleton instance of the class.
+     *
+     * @since 1.0.0
+     *
+     * @return object The Envira_Gallery_Shortcode_Lite object.
+     */
+    public static function get_instance() {
+
+        if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Envira_Gallery_Shortcode_Lite ) )
+            self::$instance = new Envira_Gallery_Shortcode_Lite();
+
+        return self::$instance;
+
+    }
+
+}
+
+// Load the shortcode class.
+$envira_gallery_shortcode_lite = Envira_Gallery_Shortcode_Lite::get_instance();

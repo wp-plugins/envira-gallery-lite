@@ -68,6 +68,14 @@
             $(envira_progress).removeAttr('style');
         });
 
+        // Apply hiding updates to settings not available in the Lite version.
+        $('.envira-lite-disabled input, .envira-lite-disabled select, .envira-lite-disabled option, .envira-lite-disabled textarea').each(function(i, el){
+            $(this).prop('disabled', true);
+        });
+        $('.envira-lite-disabled th').each(function(i, el){
+            $('<p class="envira-lite-upgrade">' + envira_gallery_metabox.upgrade + '</p>' + envira_gallery_metabox.upgrade_btn).appendTo($(this));
+        });
+
         // Conditionally show the cropping/mobile image sizes if the option is selected.
         var envira_crop_option   = $('#envira-config-crop'),
             envira_mobile_option = $('#envira-config-mobile');

@@ -216,6 +216,16 @@
 	display: block;
 }
 
+.envira-lite-disabled th,
+.envira-lite-disabled td,
+.envira-lite-disabled .description {
+    color: #aaa;
+}
+
+.envira-lite-disabled p.envira-lite-upgrade {
+    color: #444;
+}s
+
 .envira-gallery-gallery {
 	padding-left: 7px;
 }

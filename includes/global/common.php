@@ -211,7 +211,7 @@ class Envira_Gallery_Common_Lite {
             'crop'                => 0,
             'crop_width'          => 960,
             'crop_height'         => 300,
-            'mobile'              => 1,
+            'mobile'              => 0,
             'mobile_width'        => 600,
             'mobile_height'       => 200,
             'toolbar'             => 0,
@@ -463,7 +463,7 @@ class Envira_Gallery_Common_Lite {
      * @param int $post_id The current post ID.
      * @param string $slug The unique gallery slug.
      */
-    public function flush_gallery_caches( $post_id, $slug ) {
+    public function flush_gallery_caches( $post_id, $slug = '' ) {
 
         // Delete known gallery caches.
         delete_transient( '_eg_cache_' . $post_id );

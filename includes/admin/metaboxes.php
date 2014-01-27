@@ -133,7 +133,8 @@ class Envira_Gallery_Metaboxes_Lite {
                 'searching'      => __( 'Searching...', 'envira-gallery' ),
                 'sort'           => wp_create_nonce( 'envira-gallery-sort' ),
                 'spinner'        => includes_url( 'images/wpspin.gif' ),
-                'upgrade'        => sprintf( __( 'This setting is not available to modify in the Lite version. <a href="%s" target="_blank">Click here to learn how you can upgrade to the premium version of Envira Gallery to access all of the plugin features.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' )
+                'upgrade'        => __( 'This setting is not available to modify in the Lite version.', 'envira-gallery' ),
+                'upgrade_btn'    => sprintf( __( '<a class="button button-primary button-small" href="%s" target="_blank">Click to Upgrade</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' )
             )
         );
 
@@ -245,6 +246,16 @@ class Envira_Gallery_Metaboxes_Lite {
 
         // Keep security first.
         wp_nonce_field( 'envira-gallery', 'envira-gallery' );
+
+        // If no more galleries can be made, return early.
+        if ( $this->base->limit ) {
+            if ( in_array( $post->ID, get_option( 'envira_gallery_lite_limit' ) ) )
+                $this->base->upgrade( true );
+            else
+                return $this->base->upgrade();
+        } else {
+            $this->base->remaining();
+        }
 
         ?>
         <div id="envira-tabs" class="envira-clear">
@@ -424,7 +435,7 @@ class Envira_Gallery_Metaboxes_Lite {
                             <p class="description"><?php _e( 'Determines the number of columns in the gallery.', 'envira-gallery' ); ?></p>
                         </td>
                     </tr>
-                    <tr id="envira-config-gallery-theme-box">
+                    <tr id="envira-config-gallery-theme-box" class="envira-lite-disabled">
                         <th scope="row">
                             <label for="envira-config-gallery-theme"><?php _e( 'Gallery Theme', 'envira-gallery' ); ?></label>
                         </th>
@@ -477,7 +488,7 @@ class Envira_Gallery_Metaboxes_Lite {
                             <span class="description"><?php _e( 'Enables or disables image cropping for the main gallery images.', 'envira-gallery' ); ?></span>
                         </td>
                     </tr>
-                    <tr id="envira-config-crop-size-box" class="envira-lite-disabled" style="display:none;">
+                    <tr id="envira-config-crop-size-box" style="display:none;">
                         <th scope="row">
                             <label for="envira-config-crop-width"><?php _e( 'Crop Dimensions', 'envira-gallery' ); ?></label>
                         </th>
@@ -743,15 +754,11 @@ class Envira_Gallery_Metaboxes_Lite {
 
         // Save the config settings.
         $settings['config']['columns']       = preg_replace( '#[^a-z0-9-_]#', '', $_POST['_envira_gallery']['columns'] );
-        $settings['config']['gallery_theme'] = preg_replace( '#[^a-z0-9-_]#', '', $_POST['_envira_gallery']['gallery_theme'] );
         $settings['config']['gutter']        = absint( $_POST['_envira_gallery']['gutter'] );
         $settings['config']['margin']        = absint( $_POST['_envira_gallery']['margin'] );
         $settings['config']['crop']          = isset( $_POST['_envira_gallery']['crop'] ) ? 1 : 0;
         $settings['config']['crop_width']    = absint( $_POST['_envira_gallery']['crop_width'] );
         $settings['config']['crop_height']   = absint( $_POST['_envira_gallery']['crop_height'] );
-        $settings['config']['arrows']        = isset( $_POST['_envira_gallery']['arrows'] ) ? 1 : 0;
-        $settings['config']['keyboard']      = isset( $_POST['_envira_gallery']['keyboard'] ) ? 1 : 0;
-        $settings['config']['mousewheel']    = isset( $_POST['_envira_gallery']['mousewheel'] ) ? 1 : 0;
         $settings['config']['classes']       = explode( "\n", $_POST['_envira_gallery']['classes'] );
         $settings['config']['title']         = trim( strip_tags( $_POST['_envira_gallery']['title'] ) );
         $settings['config']['slug']          = sanitize_text_field( $_POST['_envira_gallery']['slug'] );

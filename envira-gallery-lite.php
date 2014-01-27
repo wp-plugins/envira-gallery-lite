@@ -91,6 +91,24 @@ class Envira_Gallery_Lite {
     public $file = __FILE__;
 
     /**
+     * Limit helper for lite.
+     *
+     * @since 1.0.0
+     *
+     * @var bool
+     */
+    public $limit = false;
+
+    /**
+     * Number helper for lite.
+     *
+     * @since 1.0.0
+     *
+     * @var int
+     */
+    public $number = 0;
+
+    /**
      * Primary class constructor.
      *
      * @since 1.0.0
@@ -250,6 +268,7 @@ class Envira_Gallery_Lite {
         $galleries = get_posts(
             array(
                 'post_type'     => 'any',
+                'post_status'   => 'publish',
                 'no_found_rows' => true,
                 'fields'        => 'ids',
                 'meta_query'    => array(
@@ -301,6 +320,7 @@ class Envira_Gallery_Lite {
         $galleries = get_posts(
             array(
                 'post_type'     => 'any',
+                'post_status'   => 'publish',
                 'no_found_rows' => true,
                 'fields'        => 'ids',
                 'meta_query'    => array(
@@ -329,6 +349,41 @@ class Envira_Gallery_Lite {
     }
 
     /**
+     * Helper method to show how many galleries are left to be created.
+     *
+     * @since 1.0.0
+     */
+    public function remaining() {
+
+        $number = 5 - (int) $this->number;
+        ?>
+        <div class="updated below-h2">
+            <p><?php printf( __( 'You have <strong>%s galleries</strong> remaining to be created in the lite version before you have reached your limit. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), $number, 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
+        </div>
+        <?php
+
+    }
+
+    /**
+     * Helper method to encourage users to upgrade once their gallery limit is reached.
+     *
+     * @since 1.0.0
+     */
+    public function upgrade( $can_edit = false ) {
+
+        ?>
+        <div class="error below-h2">
+            <?php if ( $can_edit ) : ?>
+            <p><?php printf( __( 'You have reached your limit of <strong>5 galleries</strong> for the lite version of Envira Gallery. <strong>You can still use this existing gallery.</strong> To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
+            <?php else : ?>
+            <p><?php printf( __( 'You have reached your limit of <strong>5 galleries</strong> for the lite version of Envira Gallery. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the full version.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
+            <?php endif; ?>
+        </div>
+        <?php
+
+    }
+
+    /**
      * Returns the singleton instance of the class.
      *
      * @since 1.0.0
@@ -343,6 +398,65 @@ class Envira_Gallery_Lite {
         return self::$instance;
 
     }
+
+}
+
+register_activation_hook( __FILE__, 'envira_gallery_lite_activation_hook' );
+/**
+ * Fired when the plugin is activated.
+ *
+ * @since 1.0.0
+ *
+ * @global int $wp_version      The version of WordPress for this install.
+ * @param boolean $network_wide True if WPMU superadmin uses "Network Activate" action, false otherwise.
+ */
+function envira_gallery_lite_activation_hook( $network_wide ) {
+
+    global $wp_version;
+    if ( version_compare( $wp_version, '3.8', '<' ) ) {
+        deactivate_plugins( plugin_basename( __FILE__ ) );
+        wp_die( 'Sorry, but your version of WordPress does not meet Envira Gallery\'s required version of <strong>3.8</strong> to run properly. The plugin has been deactivated. <a href="' . get_admin_url() . '">Click here to return to the Dashboard</a>.' );
+    }
+
+    if ( is_multisite() ) :
+        global $wpdb;
+        $site_list = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->blogs ORDER BY blog_id" ) );
+        foreach ( (array) $site_list as $site ) :
+            switch_to_blog( $site->blog_id );
+            $option = get_option( 'envira_gallery_lite_limit' );
+            if ( ! $option || empty( $option ) )
+                update_option( 'envira_gallery_lite_limit', array() );
+            restore_current_blog();
+        endforeach;
+    else :
+        $option = get_option( 'envira_gallery_lite_limit' );
+        if ( ! $option || empty( $option ) )
+            update_option( 'envira_gallery_lite_limit', array() );
+    endif;
+
+}
+
+register_uninstall_hook(  __FILE__, 'envira_gallery_lite_uninstall_hook'  );
+/**
+ * Fired when the plugin is uninstalled.
+ *
+ * @since 1.0.0
+ *
+ * @param boolean $network_wide True if WPMU superadmin uses "Network Deactivate" action, false otherwise.
+ */
+function envira_gallery_lite_uninstall_hook( $network_wide ) {
+
+    if ( is_multisite() ) :
+        global $wpdb;
+        $site_list = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->blogs ORDER BY blog_id" ) );
+        foreach ( (array) $site_list as $site ) :
+            switch_to_blog( $site->blog_id );
+            delete_option( 'envira_gallery_lite_limit' );
+            restore_current_blog();
+        endforeach;
+    else :
+        delete_option( 'envira_gallery_lite_limit' );
+    endif;
 
 }
 

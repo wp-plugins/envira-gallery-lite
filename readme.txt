@@ -34,6 +34,15 @@ _It's hard to go wrong by choosing [Envira Gallery](http://enviragallery.com/?ut
 3. Navigate to the Envira Gallery tab at the bottom of your admin menu and click "Add New" to begin creating your new WordPress gallery, or you can create a new gallery directly inside the post/page/custom post type of your choice.
 4. Salivate for new features and [purchase the full version of Envira Gallery](http://enviragallery.com/pricing/?utm_source=orgrepo&utm_medium=link&utm_campaign=WordPress)!
 
+== Screenshots ==
+
+1. Envira Gallery post type overview screen.
+2. Modal box to select images from your Media Library.
+3. Overlay helper with shortcode and template tag information.
+4. Media modal for inserting a gallery into your WYSIWYG editor.
+5. Gallery display on the front-end with 2 columns.
+6. Lightbox view of the gallery.
+
 == Frequently Asked Questions ==
 
 = I'd like access to more features. How can I get them? =

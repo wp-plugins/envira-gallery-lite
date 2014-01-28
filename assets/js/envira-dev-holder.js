@@ -82,3 +82,16 @@ $.Isotope.prototype._masonryResizeChanged = function() {
     // Return if updated cols/rows is not equal to previous
     return (this.masonry.cols !== prevSegments);
 };
+
+function enviraThrottle(func, wait) {
+    return function() {
+        var that = this,
+            args = [].slice(arguments);
+
+        clearTimeout(func._throttleTimeout);
+
+        func._throttleTimeout = setTimeout(function() {
+            func.apply(that, args);
+        }, wait);
+    };
+}

@@ -5,7 +5,7 @@
  * Description: Envira Gallery is best responsive WordPress gallery plugin. This is the lite version.
  * Author:      Thomas Griffin
  * Author URI:  http://thomasgriffinmedia.com
- * Version:     1.0.2
+ * Version:     1.0.2.1
  * Text Domain: envira-gallery
  * Domain Path: languages
  *
@@ -54,7 +54,7 @@ class Envira_Gallery_Lite {
      *
      * @var string
      */
-    public $version = '1.0.2';
+    public $version = '1.0.2.1';
 
     /**
      * The name of the plugin.
@@ -496,11 +496,23 @@ if ( ! function_exists( 'envira_gallery' ) ) {
      *
      * @param int $gallery_id The ID of the gallery to load.
      * @param string $type    The type of field to query.
+     * @param array $args     Associative array of args to be passed.
      * @param bool $return    Flag to echo or return the gallery HTML.
      */
-    function envira_gallery( $id, $type = 'id', $return = false ) {
+    function envira_gallery( $id, $type = 'id', $args = array(), $return = false ) {
 
-        $shortcode = '[envira-gallery ' . $type . '="' . $id . '"]';
+        // If we have args, build them into a shortcode format.
+        $args_string = '';
+        if ( ! empty( $args ) ) {
+            foreach ( (array) $args as $key => $value ) {
+                $args_string .= ' ' . $key . '="' . $value . '"';
+            }
+        }
+
+        // Build the shortcode.
+        $shortcode = ! empty( $args_string ) ? '[envira-gallery ' . $type . '="' . $id . '"' . $args_string . ']' : '[envira-gallery ' . $type . '="' . $id . '"]';
+
+        // Return or echo the shortcode output.
         if ( $return ) {
             return do_shortcode( $shortcode );
         } else {

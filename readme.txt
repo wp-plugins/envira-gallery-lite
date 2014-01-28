@@ -55,6 +55,10 @@ Envira Gallery is absolutely, positively the [best responsive WordPress gallery 
 
 == Changelog ==
 
+= 1.0.2 =
+* Fixed bug with cropped images not loading properly.
+* Added hook for cache flush utility method.
+
 = 1.0.1 =
 * Fixed bug with preloading a bunch of images and the gallery display not resorting properly.
 

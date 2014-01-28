@@ -346,7 +346,7 @@ class Envira_Gallery_Shortcode_Lite {
 
         // Generate the cropped image if necessary.
         $type = $mobile ? 'mobile' : 'crop';
-        if ( isset( $data[$type]['crop'] ) && $data[$type]['crop'] ) {
+        if ( isset( $data['config'][$type] ) && $data['config'][$type] ) {
             $common = Envira_Gallery_Common_Lite::get_instance();
             $args   = apply_filters( 'envira_gallery_crop_image_args',
                 array(

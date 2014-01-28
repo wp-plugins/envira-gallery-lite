@@ -510,6 +510,9 @@ class Envira_Gallery_Common_Lite {
             delete_transient( '_eg_cache_' . $slug );
         }
 
+        // Run a hook for Addons to access.
+        do_action( 'envira_gallery_flush_caches', $post_id, $slug );
+
     }
 
     /**

@@ -214,6 +214,7 @@ class Envira_Gallery_Shortcode_Lite {
                 }
 
                 envira_container_<?php echo $data['id']; ?>.isotope({
+                    <?php do_action( 'envira_gallery_api_isotope_config', $data ); ?>
                     transformsEnabled: false,
                     masonry: {
                         gutterWidth: <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>,
@@ -230,8 +231,7 @@ class Envira_Gallery_Shortcode_Lite {
                 }, envira_throttle_<?php echo $data['id']; ?>);
 
                 if ( 0 !== envira_holder_<?php echo $data['id']; ?>.length ) {
-                    var envira_mobile = enviraIsMobile(),
-                    envira_src_attr   = envira_mobile ? 'data-envira-src-mobile' : 'data-envira-src';
+                    var envira_src_attr = 'data-envira-src';
                     $.each(envira_holder_<?php echo $data['id']; ?>, function(i, el){
                         var envira_src = $(this).attr(envira_src_attr);
                         if ( typeof envira_src === 'undefined' || false === envira_src ) {
@@ -257,9 +257,9 @@ class Envira_Gallery_Shortcode_Lite {
                 enviraSetWidths(envira_container_<?php echo $data['id']; ?>, <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>);
 
                 $(window).smartresize(function(){
-                    transformsEnabled: false,
-                    enviraSetWidths(envira_container_<?php echo $data['id']; ?>, <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>);
                     envira_container_<?php echo $data['id']; ?>.isotope({
+                        <?php do_action( 'envira_gallery_api_isotope_config', $data ); ?>
+                        transformsEnabled: false,
                         masonry: {
                             gutterWidth: <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>,
                             columnWidth: enviraGetColWidth(envira_container_<?php echo $data['id']; ?>, <?php echo absint( $this->get_config( 'gutter', $data ) ); ?>)
@@ -268,8 +268,8 @@ class Envira_Gallery_Shortcode_Lite {
                             envira_container_<?php echo $data['id']; ?>.css('overflow', 'visible');
                             <?php do_action( 'envira_gallery_api_isotope_layout', $data ); ?>
                         }
-                    });
-                }, enviraOnFinished<?php echo $data['id']; ?>);
+                    }, enviraOnFinished<?php echo $data['id']; ?>);
+                });
 
                 <?php do_action( 'envira_gallery_api_isotope', $data ); ?>
 

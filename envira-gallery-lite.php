@@ -5,7 +5,7 @@
  * Description: Envira Gallery is best responsive WordPress gallery plugin. This is the lite version.
  * Author:      Thomas Griffin
  * Author URI:  http://thomasgriffinmedia.com
- * Version:     1.0.3
+ * Version:     1.0.3.1
  * Text Domain: envira-gallery
  * Domain Path: languages
  *
@@ -54,7 +54,7 @@ class Envira_Gallery_Lite {
      *
      * @var string
      */
-    public $version = '1.0.3';
+    public $version = '1.0.3.1';
 
     /**
      * The name of the plugin.
@@ -433,7 +433,7 @@ register_activation_hook( __FILE__, 'envira_gallery_lite_activation_hook' );
 function envira_gallery_lite_activation_hook( $network_wide ) {
 
     global $wp_version;
-    if ( version_compare( $wp_version, '3.8', '<' ) ) {
+    if ( version_compare( $wp_version, '3.8', '<' ) && ! defined( 'ENVIRA_FORCE_ACTIVATION' ) ) {
         deactivate_plugins( plugin_basename( __FILE__ ) );
         wp_die( sprintf( __( 'Sorry, but your version of WordPress does not meet Envira Gallery\'s required version of <strong>3.8</strong> to run properly. The plugin has been deactivated. <a href="%s">Click here to return to the Dashboard</a>.', 'envira-gallery' ), get_admin_url() ) );
     }

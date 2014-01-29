@@ -62,6 +62,9 @@ function envira_gallery_lite_ajax_load_image() {
     // Build out the individual HTML output for the gallery image that has just been uploaded.
     $html = Envira_Gallery_Metaboxes_Lite::get_instance()->get_gallery_item( $id, $gallery_data['gallery'][$id], $post_id );
 
+    // Flush the gallery cache.
+    Envira_Gallery_Common_Lite::get_instance()->flush_gallery_caches( $post_id );
+
     echo json_encode( $html );
     die;
 
@@ -207,6 +210,9 @@ function envira_gallery_lite_ajax_insert_images() {
     // Run hook before finishing.
     do_action( 'envira_gallery_ajax_insert_images', $images, $post_id );
 
+    // Flush the gallery cache.
+    Envira_Gallery_Common_Lite::get_instance()->flush_gallery_caches( $post_id );
+
     echo json_encode( true );
     die;
 
@@ -236,6 +242,9 @@ function envira_gallery_lite_ajax_sort_images() {
 
     // Update the gallery data.
     update_post_meta( $post_id, '_eg_gallery_data', $new_order );
+
+    // Flush the gallery cache.
+    Envira_Gallery_Common_Lite::get_instance()->flush_gallery_caches( $post_id );
 
     echo json_encode( true );
     die;
@@ -279,6 +288,9 @@ function envira_gallery_lite_ajax_remove_image() {
     // Run hook before finishing the reponse.
     do_action( 'envira_gallery_ajax_remove_images', $attach_id, $post_id );
 
+    // Flush the gallery cache.
+    Envira_Gallery_Common_Lite::get_instance()->flush_gallery_caches( $post_id );
+
     echo json_encode( true );
     die;
 
@@ -318,6 +330,9 @@ function envira_gallery_lite_ajax_save_meta() {
 
     // Update the gallery data.
     update_post_meta( $post_id, '_eg_gallery_data', $gallery_data );
+
+    // Flush the gallery cache.
+    Envira_Gallery_Common_Lite::get_instance()->flush_gallery_caches( $post_id );
 
     echo json_encode( true );
     die;

@@ -57,7 +57,6 @@ class Envira_Gallery_Metaboxes_Lite {
         add_action( 'envira_gallery_tab_images', array( $this, 'images_tab' ) );
         add_action( 'envira_gallery_tab_config', array( $this, 'config_tab' ) );
         add_action( 'envira_gallery_tab_lightbox', array( $this, 'lightbox_tab' ) );
-        add_action( 'envira_gallery_tab_thumbnails', array( $this, 'thumbnails_tab' ) );
         add_action( 'envira_gallery_tab_misc', array( $this, 'misc_tab' ) );
 
         // Add action to save metabox config options.
@@ -75,6 +74,10 @@ class Envira_Gallery_Metaboxes_Lite {
     public function meta_box_styles() {
 
         if ( 'post' !== get_current_screen()->base ) {
+            return;
+        }
+
+        if ( isset( get_current_screen()->post_type ) && in_array( get_current_screen()->post_type, $this->get_skipped_posttypes() ) ) {
             return;
         }
 
@@ -101,8 +104,12 @@ class Envira_Gallery_Metaboxes_Lite {
             return;
         }
 
+        if ( isset( get_current_screen()->post_type ) && in_array( get_current_screen()->post_type, $this->get_skipped_posttypes() ) ) {
+            return;
+        }
+
         // Set the post_id for localization.
-        $post_id = ( null === $id ) ? $post->ID : $id;
+        $post_id = isset( $post->ID ) ? $post->ID : (int) $id;
 
         // Load WordPress necessary scripts.
         wp_enqueue_script( 'plupload-handlers' );
@@ -117,21 +124,21 @@ class Envira_Gallery_Metaboxes_Lite {
             'envira_gallery_metabox',
             array(
                 'ajax'           => admin_url( 'admin-ajax.php' ),
-                'gallery'        => esc_attr__( 'Click here to use images from your media library.', 'envira-gallery' ),
+                'gallery'        => esc_attr__( 'Click Here to Insert from Other Image Sources', 'envira-gallery' ),
                 'id'             => $post_id,
+                'import'         => __( 'You must select a file to import before continuing.', 'envira-gallery' ),
                 'insert_nonce'   => wp_create_nonce( 'envira-gallery-insert-images' ),
                 'inserting'      => __( 'Inserting...', 'envira-gallery' ),
                 'library_search' => wp_create_nonce( 'envira-gallery-library-search' ),
                 'load_image'     => wp_create_nonce( 'envira-gallery-load-image' ),
                 'load_gallery'   => wp_create_nonce( 'envira-gallery-load-gallery' ),
+                'plupload'       => $this->get_plupload_init( $post_id ),
                 'refresh_nonce'  => wp_create_nonce( 'envira-gallery-refresh' ),
                 'remove'         => __( 'Are you sure you want to remove this image from the gallery?', 'envira-gallery' ),
                 'remove_nonce'   => wp_create_nonce( 'envira-gallery-remove-image' ),
                 'save_nonce'     => wp_create_nonce( 'envira-gallery-save-meta' ),
                 'saving'         => __( 'Saving...', 'envira-gallery' ),
-                'sort'           => wp_create_nonce( 'envira-gallery-sort' ),
-                'upgrade'        => __( 'This setting is not available to modify in the Lite version.', 'envira-gallery' ),
-                'upgrade_btn'    => sprintf( __( '<a class="button button-primary button-small" href="%s" target="_blank">Click to Upgrade</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' )
+                'sort'           => wp_create_nonce( 'envira-gallery-sort' )
             )
         );
 
@@ -139,6 +146,65 @@ class Envira_Gallery_Metaboxes_Lite {
         if ( isset( get_current_screen()->post_type ) && 'envira' == get_current_screen()->post_type ) {
             add_action( 'admin_head', array( $this, 'meta_box_css' ) );
         }
+
+    }
+
+    /**
+     * Returns custom plupload init properties for the media uploader.
+     *
+     * @since 1.0.0
+     *
+     * @param int $post_id The current post ID.
+     * @return array       Array of plupload init data.
+     */
+    public function get_plupload_init( $post_id ) {
+
+        // Prepare $_POST form variables and apply backwards compat filter.
+    	$post_params = array(
+    	    'post_id'  => $post_id,
+    	    '_wpnonce' => wp_create_nonce( 'media-form' ),
+    	    'type'     => '',
+    	    'tab'      => '',
+    	    'short'    => 3
+    	);
+    	$post_params = apply_filters( 'upload_post_params', $post_params );
+
+    	// Prepare upload size parameters.
+        $max_upload_size = wp_max_upload_size();
+
+        // Prepare the plupload init array.
+        $plupload_init = array(
+        	'runtimes'            => 'html5,silverlight,flash,html4',
+        	'browse_button'       => 'envira-gallery-plupload-browse-button',
+        	'container'           => 'envira-gallery-plupload-upload-ui',
+        	'drop_element'        => 'envira-gallery-drag-drop-area',
+        	'file_data_name'      => 'async-upload',
+        	'multiple_queues'     => true,
+        	'max_file_size'       => $max_upload_size . 'b',
+        	'url'                 => admin_url( 'async-upload.php' ),
+        	'flash_swf_url'       => includes_url( 'js/plupload/plupload.flash.swf' ),
+        	'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
+        	'filters'             => array(
+        	    array(
+        	        'title'       => __( 'Allowed Files', 'envira-gallery' ),
+        	        'extensions'  => '*'
+                ),
+            ),
+        	'multipart'           => true,
+        	'urlstream_upload'    => true,
+        	'multipart_params'    => $post_params
+        );
+
+        // If we are on a mobile device, disable multi selection.
+        if ( wp_is_mobile() ) {
+            $plupload_init['multi_selection'] = false;
+        }
+
+        // Apply backwards compat filter.
+        $plupload_init = apply_filters( 'plupload_init', $plupload_init );
+
+        // Return and apply a custom filter to our init data.
+        return apply_filters( 'envira_gallery_plupload_init', $plupload_init, $post_id );
 
     }
 
@@ -174,11 +240,11 @@ class Envira_Gallery_Metaboxes_Lite {
         // Loops through the post types and add the metaboxes.
         foreach ( (array) $post_types as $post_type ) {
             // Don't output boxes on these post types.
-            if ( in_array( $post_type, apply_filters( 'envira_gallery_skipped_posttypes', array( 'attachment', 'revision', 'nav_menu_item', 'soliloquy' ) ) ) ) {
+            if ( in_array( $post_type, $this->get_skipped_posttypes() ) ) {
                 continue;
             }
 
-            add_meta_box( 'envira-gallery', __( 'Envira Gallery Settings', 'envira-gallery' ), array( $this, 'meta_box_callback' ), $post_type, 'advanced', 'high' );
+            add_meta_box( 'envira-gallery', __( 'Envira Gallery Settings', 'envira-gallery' ), array( $this, 'meta_box_callback' ), $post_type, 'normal', 'high' );
         }
 
     }
@@ -199,13 +265,13 @@ class Envira_Gallery_Metaboxes_Lite {
         $post_type  = 'envira';
 
         // These are the metabox IDs you want to pass over. They don't have to match exactly. preg_match will be run on them.
-        $pass_over  = array( 'submitdiv', 'envira' );
+        $pass_over  = apply_filters( 'envira_gallery_metabox_ids', array( 'submitdiv', 'envira' ) );
 
         // All the metabox contexts you want to check.
-        $contexts   = array( 'normal', 'advanced', 'side' );
+        $contexts   = apply_filters( 'envira_gallery_metabox_contexts', array( 'normal', 'advanced', 'side' ) );
 
         // All the priorities you want to check.
-        $priorities = array( 'high', 'core', 'default', 'low' );
+        $priorities = apply_filters( 'envira_gallery_metabox_priorities', array( 'high', 'core', 'default', 'low' ) );
 
         // Loop through and target each context.
         foreach ( $contexts as $context ) {
@@ -247,20 +313,6 @@ class Envira_Gallery_Metaboxes_Lite {
         // Keep security first.
         wp_nonce_field( 'envira-gallery', 'envira-gallery' );
 
-        // Run limit checks.
-        Envira_Gallery_Common_Admin_Lite::get_instance()->limit();
-
-        // If no more galleries can be made, return early.
-        if ( $this->base->limit ) {
-            if ( in_array( $post->ID, get_option( 'envira_gallery_lite_limit' ) ) ) {
-                $this->base->upgrade( true );
-            } else {
-                return $this->base->upgrade();
-            }
-        } else {
-            $this->base->remaining();
-        }
-
         // Check for our meta overlay helper.
         $gallery_data = get_post_meta( $post->ID, '_eg_gallery_data', true );
         $helper       = get_post_meta( $post->ID, '_eg_just_published', true );
@@ -299,8 +351,7 @@ class Envira_Gallery_Metaboxes_Lite {
         $tabs = array(
             'images'     => __( 'Images', 'envira-gallery' ),
             'config'     => __( 'Config', 'envira-gallery' ),
-            'lightbox'   => __( 'Lightbox', 'envira-gallery' ),
-            'thumbnails' => __( 'Thumbnails', 'envira-gallery' ),
+            'lightbox'   => __( 'Lightbox', 'envira-gallery' )
         );
         $tabs = apply_filters( 'envira_gallery_tab_nav', $tabs );
 
@@ -320,19 +371,19 @@ class Envira_Gallery_Metaboxes_Lite {
      */
     public function images_tab( $post ) {
 
-        // Run a filter to contextualize the upload message.
-        add_filter( 'gettext', array( $this, 'upload_context' ), 1, 3 );
+        ?>
+        <div class="envira-alert envira-clear" style="margin-bottom:10px;">
+            <?php _e( '<em>Want to make your gallery workflow even better?</em> By upgrading to Envira Pro, you can get access to numerous other features, including: <strong>a fully featured gallery widget</strong>, <strong>complete gallery API</strong>, <strong>powerful gallery documentation</strong>, <strong>full mobile and Retina support</strong>, <strong>dedicated customer support</strong> and so much more! <a href="http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress" title="Click here to upgrade to Envira Pro!" target="_blank">Click here to upgrade to Envira Pro!</a>', 'envira-gallery' ); ?>
+        </div>
+        <?php
 
+        // Output the custom media upload form.
+        Envira_Gallery_Media_Lite::get_instance()->media_upload_form();
+
+        // Prepare output data.
         $gallery_data = get_post_meta( $post->ID, '_eg_gallery_data', true );
-        media_upload_form();
-
-        // Remove the contextual filter.
-        remove_filter( 'gettext', array( $this, 'upload_context' ), 1, 3 );
 
         ?>
-        <script type="text/javascript">var post_id = <?php echo $post->ID; ?>, shortform = 3;</script>
-        <input type="hidden" name="post_id" id="post_id" value="<?php echo $post->ID; ?>" />
-        <div id="media-items" class="hide-if-no-js media-upload-form" style="display:none;"></div>
         <ul id="envira-gallery-output" class="envira-clear">
             <?php if ( ! empty( $gallery_data['gallery'] ) ) : ?>
                 <?php foreach ( $gallery_data['gallery'] as $id => $data ) : ?>
@@ -341,30 +392,6 @@ class Envira_Gallery_Metaboxes_Lite {
             <?php endif; ?>
         </ul>
         <?php $this->media_library( $post );
-
-    }
-
-    /**
-     * Filter the media drag/drop upload text for better contextualization.
-     *
-     * @since 1.0.0
-     *
-     * @param string $translated_text  The translated text string.
-     * @param string $source_text      The source text string (not yet translated).
-     * @param string $domain           The textdomain for the text string.
-     * @return string $translated_text Amended translated text.
-     */
-    public function upload_context( $translated_text, $source_text, $domain ) {
-
-        if ( 'Drop files here' === $source_text ) {
-            return __( 'Drop images here', 'envira-gallery' );
-        }
-
-        if ( 'Select Files' === $source_text ) {
-            return __( 'Select Images', 'envira-gallery' );
-        }
-
-        return $translated_text;
 
     }
 
@@ -537,19 +564,6 @@ class Envira_Gallery_Metaboxes_Lite {
                             <p class="description"><?php _e( 'Sets the theme for the gallery display.', 'envira-gallery' ); ?></p>
                         </td>
                     </tr>
-                    <tr id="envira-config-lightbox-theme-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-lightbox-theme"><?php _e( 'Gallery Lightbox Theme', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <select id="envira-config-lightbox-theme" name="_envira_gallery[lightbox_theme]">
-                                <?php foreach ( (array) $this->get_lightbox_themes() as $i => $data ) : ?>
-                                    <option value="<?php echo $data['value']; ?>"<?php selected( $data['value'], $this->get_config( 'lightbox_theme', $this->get_config_default( 'lightbox_theme' ) ) ); ?>><?php echo $data['name']; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <p class="description"><?php _e( 'Sets the theme for the gallery lightbox display.', 'envira-gallery' ); ?></p>
-                        </td>
-                    </tr>
                     <tr id="envira-config-gutter-box">
                         <th scope="row">
                             <label for="envira-config-gutter"><?php _e( 'Column Gutter Width', 'envira-gallery' ); ?></label>
@@ -586,27 +600,12 @@ class Envira_Gallery_Metaboxes_Lite {
                             <p class="description"><?php _e( 'You should adjust these dimensions based on the number of columns in your gallery.', 'envira-gallery' ); ?></p>
                         </td>
                     </tr>
-                    <tr id="envira-config-mobile-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-mobile"><?php _e( 'Create Mobile Gallery Images?', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <input id="envira-config-mobile" type="checkbox" name="_envira_gallery[mobile]" value="<?php echo $this->get_config( 'mobile', $this->get_config_default( 'mobile' ) ); ?>" <?php checked( $this->get_config( 'mobile', $this->get_config_default( 'mobile' ) ), 1 ); ?> />
-                            <span class="description"><?php _e( 'Enables or disables creating specific images for mobile devices.', 'envira-gallery' ); ?></span>
-                        </td>
-                    </tr>
-                    <tr id="envira-config-mobile-size-box" class="envira-lite-disabled" style="display:none;">
-                        <th scope="row">
-                            <label for="envira-config-mobile-width"><?php _e( 'Mobile Dimensions', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <input id="envira-config-mobile-width" type="number" name="_envira_gallery[mobile_width]" value="<?php echo $this->get_config( 'mobile_width', $this->get_config_default( 'mobile_width' ) ); ?>" <?php checked( $this->get_config( 'mobile_width', $this->get_config_default( 'mobile_width' ) ), 1 ); ?> /> &#215; <input id="envira-config-mobile-height" type="number" name="_envira_gallery[mobile_height]" value="<?php echo $this->get_config( 'mobile_height', $this->get_config_default( 'mobile_height' ) ); ?>" <?php checked( $this->get_config( 'mobile_height', $this->get_config_default( 'mobile_height' ) ), 1 ); ?> />
-                            <p class="description"><?php _e( 'These will be the sizes used for images displayed on mobile devices.', 'envira-gallery' ); ?></p>
-                        </td>
-                    </tr>
                     <?php do_action( 'envira_gallery_config_box', $post ); ?>
                 </tbody>
             </table>
+            <div class="envira-alert envira-clear">
+                <?php _e( '<em>Want to do even more with your gallery display?</em> By upgrading to Envira Pro, you can get access to numerous other gallery display features, including: <strong>custom image tagging and filtering</strong>, <strong>mobile specific image assets for blazing fast load times</strong>, <strong>dedicated and unique gallery URLs</strong>, <strong>custom gallery themes</strong>, <strong>gallery thumbnail support</strong> and so much more! <a href="http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress" title="Click here to upgrade to Envira Pro!" target="_blank">Click here to upgrade to Envira Pro!</a>', 'envira-gallery' ); ?>
+            </div>
         </div>
         <?php
 
@@ -626,151 +625,25 @@ class Envira_Gallery_Metaboxes_Lite {
             <p class="envira-intro"><?php _e( 'The settings below adjust the lightbox outputs and displays.', 'envira-gallery' ); ?></p>
             <table class="form-table">
                 <tbody>
-                    <tr id="envira-config-lightbox-title-display-box" class="envira-lite-disabled">
+                    <tr id="envira-config-lightbox-theme-box">
                         <th scope="row">
-                            <label for="envira-config-lightbox-title-display"><?php _e( 'Gallery Title Position', 'envira-gallery' ); ?></label>
+                            <label for="envira-config-lightbox-theme"><?php _e( 'Gallery Lightbox Theme', 'envira-gallery' ); ?></label>
                         </th>
                         <td>
-                            <select id="envira-config-lightbox-title-display" name="_envira_gallery[title_display]">
-                                <?php foreach ( (array) $this->get_title_displays() as $i => $data ) : ?>
-                                    <option value="<?php echo $data['value']; ?>"<?php selected( $data['value'], $this->get_config( 'title_display', $this->get_config_default( 'title_display' ) ) ); ?>><?php echo $data['name']; ?></option>
+                            <select id="envira-config-lightbox-theme" name="_envira_gallery[lightbox_theme]">
+                                <?php foreach ( (array) $this->get_lightbox_themes() as $i => $data ) : ?>
+                                    <option value="<?php echo $data['value']; ?>"<?php selected( $data['value'], $this->get_config( 'lightbox_theme', $this->get_config_default( 'lightbox_theme' ) ) ); ?>><?php echo $data['name']; ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <p class="description"><?php _e( 'Sets the display of the lightbox title.', 'envira-gallery' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr id="envira-config-lightbox-arrows-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-lightbox-arrows"><?php _e( 'Enable Gallery Arrows?', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <input id="envira-config-lightbox-arrows" type="checkbox" name="_envira_gallery[arrows]" value="<?php echo $this->get_config( 'arrows', $this->get_config_default( 'arrows' ) ); ?>" <?php checked( $this->get_config( 'arrows', $this->get_config_default( 'arrows' ) ), 1 ); ?> />
-                            <span class="description"><?php _e( 'Enables or disables the gallery lightbox navigation arrows.', 'envira-gallery' ); ?></span>
-                        </td>
-                    </tr>
-                    <tr id="envira-config-lightbox-keyboard-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-lightbox-keyboard"><?php _e( 'Enable Keyboard Navigation?', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <input id="envira-config-lightbox-keyboard" type="checkbox" name="_envira_gallery[keyboard]" value="<?php echo $this->get_config( 'keyboard', $this->get_config_default( 'keyboard' ) ); ?>" <?php checked( $this->get_config( 'keyboard', $this->get_config_default( 'keyboard' ) ), 1 ); ?> />
-                            <span class="description"><?php _e( 'Enables or disables keyboard navigation in the gallery lightbox.', 'envira-gallery' ); ?></span>
-                        </td>
-                    </tr>
-                    <tr id="envira-config-lightbox-mousewheel-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-lightbox-mousewheel"><?php _e( 'Enable Mousewheel Navigation?', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <input id="envira-config-lightbox-mousewheel" type="checkbox" name="_envira_gallery[mousewheel]" value="<?php echo $this->get_config( 'mousewheel', $this->get_config_default( 'mousewheel' ) ); ?>" <?php checked( $this->get_config( 'mousewheel', $this->get_config_default( 'mousewheel' ) ), 1 ); ?> />
-                            <span class="description"><?php _e( 'Enables or disables mousewheel navigation in the gallery.', 'envira-gallery' ); ?></span>
-                        </td>
-                    </tr>
-                    <tr id="envira-config-lightbox-toolbar-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-lightbox-toolbar"><?php _e( 'Enable Gallery Toolbar?', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <input id="envira-config-lightbox-toolbar" type="checkbox" name="_envira_gallery[toolbar]" value="<?php echo $this->get_config( 'toolbar', $this->get_config_default( 'toolbar' ) ); ?>" <?php checked( $this->get_config( 'toolbar', $this->get_config_default( 'toolbar' ) ), 1 ); ?> />
-                            <span class="description"><?php _e( 'Enables or disables the gallery lightbox toolbar.', 'envira-gallery' ); ?></span>
-                        </td>
-                    </tr>
-                    <tr id="envira-config-lightbox-toolbar-position-box" class="envira-lite-disabled" style="display:none;">
-                        <th scope="row">
-                            <label for="envira-config-lightbox-toolbar-position"><?php _e( 'Gallery Toolbar Position', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <select id="envira-config-lightbox-toolbar-position" name="_envira_gallery[toolbar_position]">
-                                <?php foreach ( (array) $this->get_toolbar_positions() as $i => $data ) : ?>
-                                    <option value="<?php echo $data['value']; ?>"<?php selected( $data['value'], $this->get_config( 'toolbar_position', $this->get_config_default( 'toolbar_position' ) ) ); ?>><?php echo $data['name']; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <p class="description"><?php _e( 'Sets the position of the lightbox toolbar.', 'envira-gallery' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr id="envira-config-lightbox-aspect-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-lightbox-aspect"><?php _e( 'Keep Aspect Ratio?', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <input id="envira-config-lightbox-toolbar" type="checkbox" name="_envira_gallery[aspect]" value="<?php echo $this->get_config( 'aspect', $this->get_config_default( 'aspect' ) ); ?>" <?php checked( $this->get_config( 'aspect', $this->get_config_default( 'aspect' ) ), 1 ); ?> />
-                            <span class="description"><?php _e( 'If enabled, images will always resize based on the original aspect ratio.', 'envira-gallery' ); ?></span>
-                        </td>
-                    </tr>
-                    <tr id="envira-config-lightbox-loop-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-lightbox-loop"><?php _e( 'Loop Gallery Navigation?', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <input id="envira-config-lightbox-loop" type="checkbox" name="_envira_gallery[loop]" value="<?php echo $this->get_config( 'loop', $this->get_config_default( 'loop' ) ); ?>" <?php checked( $this->get_config( 'loop', $this->get_config_default( 'loop' ) ), 1 ); ?> />
-                            <span class="description"><?php _e( 'Enables or disables infinite navigation cycling of the lightbox gallery.', 'envira-gallery' ); ?></span>
+                            <p class="description"><?php _e( 'Sets the theme for the gallery lightbox display.', 'envira-gallery' ); ?></p>
                         </td>
                     </tr>
                     <?php do_action( 'envira_gallery_lightbox_box', $post ); ?>
                 </tbody>
             </table>
-        </div>
-        <?php
-
-    }
-
-    /**
-     * Callback for displaying the UI for setting gallery thumbnail options.
-     *
-     * @since 1.0.0
-     *
-     * @param object $post The current post object.
-     */
-    public function thumbnails_tab( $post ) {
-
-        ?>
-        <div id="envira-thumbnails">
-            <p class="envira-intro"><?php _e( 'If enabled, thumbnails are generated automatically inside the lightbox. The settings below adjust the thumbnail views for the gallery lightbox display.', 'envira-gallery' ); ?></p>
-            <table class="form-table">
-                <tbody>
-                    <tr id="envira-config-thumbnails-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-thumbnails"><?php _e( 'Enable Gallery Thumbnails?', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <input id="envira-config-thumbnails" type="checkbox" name="_envira_gallery[thumbnails]" value="<?php echo $this->get_config( 'thumbnails', $this->get_config_default( 'thumbnails' ) ); ?>" <?php checked( $this->get_config( 'thumbnails', $this->get_config_default( 'thumbnails' ) ), 1 ); ?> />
-                            <span class="description"><?php _e( 'Enables or disables the gallery lightbox thumbnails.', 'envira-gallery' ); ?></span>
-                        </td>
-                    </tr>
-                    <tr id="envira-config-thumbnails-width-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-thumbnails-width"><?php _e( 'Gallery Thumbnails Width', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <input id="envira-config-thumbnails-width" type="number" name="_envira_gallery[thumbnails_width]" value="<?php echo $this->get_config( 'thumbnails_width', $this->get_config_default( 'thumbnails_width' ) ); ?>" />
-                            <p class="description"><?php _e( 'Sets the width of the lightbox thumbnails.', 'envira-gallery' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr id="envira-config-thumbnails-height-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-thumbnails-height"><?php _e( 'Gallery Thumbnails Height', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <input id="envira-config-thumbnails-height" type="number" name="_envira_gallery[thumbnails_height]" value="<?php echo $this->get_config( 'thumbnails_height', $this->get_config_default( 'thumbnails_height' ) ); ?>" />
-                            <p class="description"><?php _e( 'Sets the height of the lightbox thumbnails.', 'envira-gallery' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr id="envira-config-thumbnails-position-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-thumbnails-position"><?php _e( 'Gallery Thumbnails Position', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <select id="envira-config-thumbnails-position" name="_envira_gallery[thumbnails_position]">
-                                <?php foreach ( (array) $this->get_thumbnail_positions() as $i => $data ) : ?>
-                                    <option value="<?php echo $data['value']; ?>"<?php selected( $data['value'], $this->get_config( 'thumbnails_position', $this->get_config_default( 'thumbnails_position' ) ) ); ?>><?php echo $data['name']; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <p class="description"><?php _e( 'Sets the position of the lightbox thumbnails.', 'envira-gallery' ); ?></p>
-                        </td>
-                    </tr>
-                    <?php do_action( 'envira_gallery_thumbnails_box', $post ); ?>
-                </tbody>
-            </table>
+            <div class="envira-alert envira-clear">
+                <?php _e( '<em>Want even more fine tuned control over your lightbox display?</em> By upgrading to Envira Pro, you can get access to numerous other lightbox features, including: <strong>custom lightbox titles</strong>, <strong>enable/disable lightbox controls (arrow, keyboard and mousehweel navigation)</strong>, <strong>custom lightbox transition effects</strong>, <strong>native fullscreen support</strong>, <strong>gallery deeplinking</strong>, <strong>image protection</strong>, <strong>lightbox supersize effects</strong>, <strong>lightbox slideshows</strong> and so much more! <a href="http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress" title="Click here to upgrade to Envira Pro!" target="_blank">Click here to upgrade to Envira Pro!</a>', 'envira-gallery' ); ?>
+            </div>
         </div>
         <?php
 
@@ -817,32 +690,12 @@ class Envira_Gallery_Metaboxes_Lite {
                             <p class="description"><?php _e( 'Adds custom CSS classes to this gallery. Enter one class per line.', 'envira-gallery' ); ?></p>
                         </td>
                     </tr>
-                    <tr id="envira-config-import-export-box" class="envira-lite-disabled">
-                        <th scope="row">
-                            <label for="envira-config-import-gallery"><?php _e( 'Import/Export Gallery', 'envira-gallery' ); ?></label>
-                        </th>
-                        <td>
-                            <form></form>
-                            <?php $import_url = 'auto-draft' == $post->post_status ? add_query_arg( array( 'post' => $post->ID, 'action' => 'edit', 'envira-gallery-imported' => true ), admin_url( 'post.php' ) ) : add_query_arg( 'envira-gallery-imported', true ); ?>
-                            <form action="<?php echo $import_url; ?>" id="envira-config-import-gallery-form" class="envira-gallery-import-form" method="post" enctype="multipart/form-data">
-                                <input id="envira-config-import-gallery" type="file" name="envira_import_gallery" />
-                                <input type="hidden" name="envira_import" value="1" />
-                                <input type="hidden" name="envira_post_id" value="<?php echo $post->ID; ?>" />
-                                <?php wp_nonce_field( 'envira-gallery-import', 'envira-gallery-import' ); ?>
-                                <?php submit_button( __( 'Import Gallery', 'envira-gallery' ), 'secondary', 'envira-gallery-import-submit', false ); ?>
-                                <span class="spinner envira-gallery-spinner"></span>
-                            </form>
-                            <form id="envira-config-export-gallery-form" method="post">
-                                <input type="hidden" name="envira_export" value="1" />
-                                <input type="hidden" name="envira_post_id" value="<?php echo $post->ID; ?>" />
-                                <?php wp_nonce_field( 'envira-gallery-export', 'envira-gallery-export' ); ?>
-                                <?php submit_button( __( 'Export Gallery', 'envira-gallery' ), 'secondary', 'envira-gallery-export-submit', false ); ?>
-                            </form>
-                        </td>
-                    </tr>
                     <?php do_action( 'envira_gallery_misc_box', $post ); ?>
                 </tbody>
             </table>
+            <div class="envira-alert envira-clear">
+                <?php _e( '<em>Want to take your galleries further?</em> By upgrading to Envira Pro, you can get access to numerous other features, including: <strong>a fully-integrated import/export module for your galleries</strong>, <strong>custom CSS controls for each gallery</strong> and so much more! <a href="http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress" title="Click here to upgrade to Envira Pro!" target="_blank">Click here to upgrade to Envira Pro!</a>', 'envira-gallery' ); ?>
+            </div>
         </div>
         <?php
 
@@ -914,13 +767,8 @@ class Envira_Gallery_Metaboxes_Lite {
 
         // If on an envira post type, map the title and slug of the post object to the custom fields if no value exists yet.
         if ( isset( $post->post_type ) && 'envira' == $post->post_type ) {
-            if ( empty( $settings['config']['title'] ) ) {
-                $settings['config']['title'] = trim( strip_tags( $post->post_title ) );
-            }
-
-            if ( empty( $settings['config']['slug'] ) ) {
-                $settings['config']['slug'] = sanitize_text_field( $post->post_name );
-            }
+            $settings['config']['title'] = trim( strip_tags( $post->post_title ) );
+            $settings['config']['slug']  = sanitize_text_field( $post->post_name );
         }
 
         // Provide a filter to override settings.
@@ -948,9 +796,6 @@ class Envira_Gallery_Metaboxes_Lite {
 
         // Finally, flush all gallery caches to ensure everything is up to date.
         $this->flush_gallery_caches( $post_id, $settings['config']['slug'] );
-
-        // Update the limit checker.
-        Envira_Gallery_Common_Admin_Lite::get_instance()->update_limit( $post_id );
 
     }
 
@@ -1024,7 +869,7 @@ class Envira_Gallery_Metaboxes_Lite {
                                                 <th scope="row"><label for="envira-gallery-link-<?php echo $id; ?>"><?php _e( 'Image Hyperlink', 'envira-gallery' ); ?></label></th>
                                                 <td>
                                                     <input id="envira-gallery-link-<?php echo $id; ?>" class="envira-gallery-link" type="text" name="_envira_gallery[meta_link]" value="<?php echo esc_url( $data['link'] ); ?>" data-envira-meta="link" />
-                                                    <p class="description"><?php _e( 'The image hyperlink determines what opens up in the lightbox once the image is clicked. Defaults to a larger version of itself.', 'envira-gallery' ); ?></p>
+                                                    <p class="description"><?php _e( 'The image hyperlink determines what opens up in the lightbox once the image is clicked. If this link is set to a regular web page, it will go to that page. Defaults to a larger version of the image itself.', 'envira-gallery' ); ?></p>
                                                 </td>
                                             </tr>
                                             <?php do_action( 'envira_gallery_after_meta_settings', $id, $data, $post_id ); ?>
@@ -1040,7 +885,7 @@ class Envira_Gallery_Metaboxes_Lite {
                                         <strong><?php _e( 'Image Hyperlinks', 'envira-gallery' ); ?></strong>
                                         <p><?php _e( 'The image hyperlink field is used when you click on an image in the gallery. It determines what is displayed in the lightbox view. It could be a larger version of the image, a video, or some other form of content.', 'envira-gallery' ); ?></p>
                                         <strong><?php _e( 'Saving and Exiting', 'envira-gallery' ); ?></strong>
-                                        <p class="no-margin"><?php _e( 'Click on the blue button below to save your image metadata. You can close this window by either clicking on the "X" above or hitting the <code>esc</code> key on your keyboard.', 'envira-gallery' ); ?></p>
+                                        <p class="no-margin"><?php _e( 'Click on the button below to save your image metadata. You can close this window by either clicking on the "X" above or hitting the <code>esc</code> key on your keyboard.', 'envira-gallery' ); ?></p>
                                     </div><!-- end .envira-gallery-meta-sidebar -->
                                 </div><!-- end .media-sidebar -->
                             </div><!-- end .attachments-browser -->
@@ -1162,7 +1007,7 @@ class Envira_Gallery_Metaboxes_Lite {
         global $id, $post;
 
         // Get the current post ID.
-        $post_id = ( null === $id ) ? $post->ID : $id;
+        $post_id = isset( $post->ID ) ? $post->ID : (int) $id;
 
         $settings = get_post_meta( $post_id, '_eg_gallery_data', true );
         if ( isset( $settings['config'][$key] ) ) {
@@ -1231,44 +1076,15 @@ class Envira_Gallery_Metaboxes_Lite {
     }
 
     /**
-     * Helper method for retrieving title displays.
+     * Returns the post types to skip for loading Envira metaboxes.
      *
-     * @since 1.0.0
+     * @since 1.0.7
      *
-     * @return array Array of title display data.
+     * @return array Array of skipped posttypes.
      */
-    public function get_title_displays() {
+    public function get_skipped_posttypes() {
 
-        $instance = Envira_Gallery_Common_Lite::get_instance();
-        return $instance->get_title_displays();
-
-    }
-
-    /**
-     * Helper method for retrieving toolbar positions.
-     *
-     * @since 1.0.0
-     *
-     * @return array Array of toolbar position data.
-     */
-    public function get_toolbar_positions() {
-
-        $instance = Envira_Gallery_Common_Lite::get_instance();
-        return $instance->get_toolbar_positions();
-
-    }
-
-    /**
-     * Helper method for retrieving thumbnail positions.
-     *
-     * @since 1.0.0
-     *
-     * @return array Array of thumbnail position data.
-     */
-    public function get_thumbnail_positions() {
-
-        $instance = Envira_Gallery_Common_Lite::get_instance();
-        return $instance->get_thumbnail_positions();
+        return apply_filters( 'envira_gallery_skipped_posttypes', array( 'attachment', 'revision', 'nav_menu_item', 'soliloquy', 'soliloquyv2' ) );
 
     }
 

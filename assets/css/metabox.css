@@ -386,7 +386,8 @@
     margin: 0;
 }
 
-.envira-gallery-meta-wrap .form-table input[type=text] {
+.envira-gallery-meta-wrap .form-table input[type=text],
+.envira-gallery-meta-wrap .form-table textarea {
     width: 100%;
 }
 
@@ -402,19 +403,74 @@
     font-size: 13px;
 }
 
-.envira-lite-disabled th,
-.envira-lite-disabled td,
-.envira-lite-disabled .description {
-    color: #aaa;
-}
-
-.envira-lite-disabled p.envira-lite-upgrade {
-    color: #dd3d36;
-}
-
 #envira-gallery textarea {
     width: 100%;
 }
+
+.envira-alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #faebcc;
+    border-radius: 4px;
+    background-color: #fcf8e3;
+    color: #8a6d3b;
+}
+
+/* ==========================================================================
+   Plupload Styles
+   ========================================================================== */
+
+#envira-gallery-plupload-upload-ui {
+    position: relative;
+}
+
+#envira-gallery-drag-drop-area {
+    border: 4px dashed #bbb;
+    height: 200px;
+}
+
+#envira-gallery-plupload-upload-ui.drag-over #envira-gallery-drag-drop-area {
+    border-color: #83b4d8;
+}
+
+#envira-gallery .envira-gallery-progress-bar {
+    display: none;
+    width: 100%;
+    position: relative;
+    height: 10px;
+    width: 100%;
+    margin: 10px auto;
+    border-radius: 10px;
+    background: #dfdfdf;
+    background: rgba(0,0,0,.1);
+}
+
+#envira-gallery .envira-gallery-progress-bar div {
+    height: 10px;
+    min-width: 20px;
+    width: 0;
+    background: #aaa;
+    background: rgba(0,0,0,.2);
+    border-radius: 10px;
+    -webkit-transition: width 300ms;
+    -moz-transition: width 300ms;
+    -ms-transition: width 300ms;
+    -o-transition: width 300ms;
+    transition: width 300ms;
+}
+
+#envira-gallery .upload-flash-bypass {
+    display: none;
+}
+
+#envira-gallery .max-upload-size {
+    display: block;
+    margin: 10px 0;
+}
+
+/* ==========================================================================
+   Retina Styles
+   ========================================================================== */
 
 @media
 only screen and (-webkit-min-device-pixel-ratio: 2),

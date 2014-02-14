@@ -18,14 +18,6 @@
  * ========================================================== */
 ;(function($){
     $(function(){
-        // Apply hiding updates to settings not available in the Lite version.
-        $('.envira-lite-disabled input, .envira-lite-disabled select, .envira-lite-disabled option, .envira-lite-disabled textarea').each(function(i, el){
-            $(this).prop('disabled', true);
-        });
-        $('.envira-lite-disabled th').each(function(i, el){
-            $('<p class="envira-lite-upgrade">' + envira_gallery_metabox.upgrade + '</p>' + envira_gallery_metabox.upgrade_btn).appendTo($(this));
-        });
-
         // Initialize the gallery tabs.
         var envira_tabs     = $('#envira-tabs'),
             envira_tabs_nav = $('#envira-tabs-nav');
@@ -49,16 +41,59 @@
         $('#envira-gallery .max-upload-size').append(' <a class="envira-media-library button button-primary" href="#" title="' + envira_gallery_metabox.gallery + '" style="vertical-align: baseline;">' + envira_gallery_metabox.gallery + '</a>');
 
         // Attach to when files are being uploaded - uploader is the global variable that will handle the uploading process.
-        var envira_uploader = uploader,
+        var envira_uploader = new plupload.Uploader(envira_gallery_metabox.plupload),
             envira_bar      = $('#envira-gallery .envira-progress-bar'),
             envira_progress = $('#envira-gallery .envira-progress-bar div'),
             envira_output   = $('#envira-gallery-output');
 
         // Only move forward if the uploader is present.
         if ( envira_uploader ) {
+            envira_uploader.bind('Init', function(up) {
+    			var uploaddiv = $('#envira-gallery-plupload-upload-ui');
+    			enviraSetResize( getUserSetting( 'upload_resize', false ) );
+
+                // If drag and drop, make that happen.
+    			if ( up.features.dragdrop && ! $(document.body).hasClass('mobile') ) {
+    				uploaddiv.addClass('drag-drop');
+    				$('#envira-gallery-drag-drop-area').bind('dragover.wp-uploader', function(){
+    					uploaddiv.addClass('drag-over');
+    				}).bind('dragleave.wp-uploader, drop.wp-uploader', function(){
+    					uploaddiv.removeClass('drag-over');
+    				});
+    			} else {
+    				uploaddiv.removeClass('drag-drop');
+    				$('#envira-gallery-drag-drop-area').unbind('.wp-uploader');
+    			}
+
+                // If we have an HTML4 runtime, hide the flash bypass.
+    			if ( up.runtime == 'html4' )
+    				$('.upload-flash-bypass').hide();
+    		});
+
+            // Initialize the uploader.
+		    envira_uploader.init();
+
             // Bind to the FilesAdded event to show the progess bar.
-            envira_uploader.bind('FilesAdded', function(){
+            envira_uploader.bind('FilesAdded', function(up, files){
+                var hundredmb = 100 * 1024 * 1024,
+                    max       = parseInt(up.settings.max_file_size, 10);
+
+                // Remove any errors.
+                $('#envira-gallery-upload-error').html('');
+
+                // Show the progress bar.
                 $(envira_bar).show().css('display', 'block');
+
+                // Upload the files.
+    			plupload.each(files, function(file){
+    				if ( max > hundredmb && file.size > hundredmb && up.runtime != 'html5' ) {
+    					enviraUploadError( up, file, true );
+    				}
+    			});
+
+                // Refresh and start.
+    			up.refresh();
+    			up.start();
             });
 
             // Bind to the UploadProgress event to manipulate the progress bar.
@@ -79,6 +114,11 @@
                     },
                     function(res){
                         $(envira_output).append(res);
+                        $('#envira-gallery-output').find('.wp-editor-container').each(function(i, el){
+                            var id = $(el).attr('id').split('-')[4];
+                            quicktags({id: 'envira-gallery-title-' + id, buttons: 'strong,em,link,ul,ol,li,close'});
+                            QTags._buttonsInit(); // Force buttons to initialize.
+                        });
                     },
                     'json'
                 );
@@ -89,6 +129,54 @@
                 $(envira_bar).hide().css('display', 'none');
                 $(envira_progress).removeAttr('style');
             });
+
+            // Bind to any errors and output them on the screen.
+            envira_uploader.bind('Error', function(up, error) {
+    			var hundredmb = 100 * 1024 * 1024,
+    			    error_el  = $('#envira-gallery-upload-error'),
+    			    max;
+            	switch (error) {
+            		case plupload.FAILED:
+            		case plupload.FILE_EXTENSION_ERROR:
+            			error_el.html('<p class="error">' + pluploadL10n.upload_failed + '</p>');
+            			break;
+            		case plupload.FILE_SIZE_ERROR:
+            			enviraUploadError(up, error.file);
+            			break;
+            		case plupload.IMAGE_FORMAT_ERROR:
+            			wpFileError(fileObj, pluploadL10n.not_an_image);
+            			break;
+            		case plupload.IMAGE_MEMORY_ERROR:
+            			wpFileError(fileObj, pluploadL10n.image_memory_exceeded);
+            			break;
+            		case plupload.IMAGE_DIMENSIONS_ERROR:
+            			wpFileError(fileObj, pluploadL10n.image_dimensions_exceeded);
+            			break;
+            		case plupload.GENERIC_ERROR:
+            			wpQueueError(pluploadL10n.upload_failed);
+            			break;
+            		case plupload.IO_ERROR:
+            			max = parseInt(uploader.settings.max_file_size, 10);
+
+            			if ( max > hundredmb && fileObj.size > hundredmb )
+            				wpFileError(fileObj, pluploadL10n.big_upload_failed.replace('%1$s', '<a class="uploader-html" href="#">').replace('%2$s', '</a>'));
+            			else
+            				wpQueueError(pluploadL10n.io_error);
+            			break;
+            		case plupload.HTTP_ERROR:
+            			wpQueueError(pluploadL10n.http_error);
+            			break;
+            		case plupload.INIT_ERROR:
+            			$('.media-upload-form').addClass('html-uploader');
+            			break;
+            		case plupload.SECURITY_ERROR:
+            			wpQueueError(pluploadL10n.security_error);
+            			break;
+            		default:
+            			wpFileError(fileObj, pluploadL10n.default_error);
+            	}
+    			up.refresh();
+    		});
         }
 
         // Conditionally show necessary fields.
@@ -482,6 +570,33 @@
                 else
                     $('#envira-config-lightbox-toolbar-position-box').fadeOut(300);
             });
+        }
+
+        // Function for setting resize.
+        function enviraSetResize( arg ) {
+            if ( arg ) {
+                if ( envira_uploader.features.jpgresize ) {
+        			envira_uploader.settings.resize = { width: resize_width, height: resize_height, quality: 100 };
+        		} else {
+        			envira_uploader.settings.multipart_params.image_resize = true;
+                }
+            } else {
+                delete(envira_uploader.settings.resize);
+                delete(envira_uploader.settings.multipart_params.image_resize);
+            }
+        }
+
+        // Function for displaying file upload errors.
+        function enviraUploadError( up, file, over100mb ) {
+            var message;
+
+        	if ( over100mb )
+        		message = pluploadL10n.big_upload_queued.replace('%s', file.name) + ' ' + pluploadL10n.big_upload_failed.replace('%1$s', '<a class="uploader-html" href="#">').replace('%2$s', '</a>');
+        	else
+        		message = pluploadL10n.file_exceeds_size_limit.replace('%s', file.name);
+
+        	$('#envira-gallery-upload-error').html('<p class="error">' + message + '</p>');
+        	up.removeFile(file);
         }
     });
 }(jQuery));

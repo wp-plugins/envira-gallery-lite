@@ -5,7 +5,7 @@
  * Description: Envira Gallery is best responsive WordPress gallery plugin. This is the lite version.
  * Author:      Thomas Griffin
  * Author URI:  http://thomasgriffinmedia.com
- * Version:     1.0.3.1
+ * Version:     1.0.4
  * Text Domain: envira-gallery
  * Domain Path: languages
  *
@@ -54,7 +54,7 @@ class Envira_Gallery_Lite {
      *
      * @var string
      */
-    public $version = '1.0.3.1';
+    public $version = '1.0.4';
 
     /**
      * The name of the plugin.
@@ -183,6 +183,7 @@ class Envira_Gallery_Lite {
         require plugin_dir_path( __FILE__ ) . 'includes/admin/ajax.php';
         require plugin_dir_path( __FILE__ ) . 'includes/admin/common.php';
         require plugin_dir_path( __FILE__ ) . 'includes/admin/editor.php';
+        require plugin_dir_path( __FILE__ ) . 'includes/admin/media.php';
         require plugin_dir_path( __FILE__ ) . 'includes/admin/metaboxes.php';
         require plugin_dir_path( __FILE__ ) . 'includes/admin/posttype.php';
 
@@ -366,43 +367,6 @@ class Envira_Gallery_Lite {
     }
 
     /**
-     * Helper method to show how many galleries are left to be created.
-     *
-     * @since 1.0.0
-     */
-    public function remaining() {
-
-        $number = 5 - (int) $this->number;
-        ?>
-        <div class="updated below-h2">
-            <p><?php printf( __( 'You have <strong>%s</strong> remaining to be created in the Lite version before you have reached your limit. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the premium version.</a>', 'envira-gallery' ), sprintf( _n( '1 gallery', '%s galleries', (int) $number, 'envira-gallery' ), (int) $number ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
-        </div>
-        <?php
-
-    }
-
-    /**
-     * Helper method to encourage users to upgrade once their gallery limit is reached.
-     *
-     * @since 1.0.0
-     *
-     * @param bool $can_edit Flag if the user can still edit the gallery.
-     */
-    public function upgrade( $can_edit = false ) {
-
-        ?>
-        <div class="error below-h2">
-            <?php if ( $can_edit ) : ?>
-            <p><?php printf( __( 'You have reached your limit of <strong>5 galleries</strong> for the Lite version of Envira Gallery. <strong>You can still use this existing gallery.</strong> To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the premium version.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
-            <?php else : ?>
-            <p><?php printf( __( 'You have reached your limit of <strong>5 galleries</strong> for the Lite version of Envira Gallery. To create unlimited galleries and gain access to all plugin features, <a href="%s" target="_blank">click here to upgrade to the premium version.</a>', 'envira-gallery' ), 'http://enviragallery.com/lite/?utm_source=liteplugin&utm_medium=link&utm_campaign=WordPress' ); ?></p>
-            <?php endif; ?>
-        </div>
-        <?php
-
-    }
-
-    /**
      * Returns the singleton instance of the class.
      *
      * @since 1.0.0
@@ -436,50 +400,6 @@ function envira_gallery_lite_activation_hook( $network_wide ) {
     if ( version_compare( $wp_version, '3.8', '<' ) && ! defined( 'ENVIRA_FORCE_ACTIVATION' ) ) {
         deactivate_plugins( plugin_basename( __FILE__ ) );
         wp_die( sprintf( __( 'Sorry, but your version of WordPress does not meet Envira Gallery\'s required version of <strong>3.8</strong> to run properly. The plugin has been deactivated. <a href="%s">Click here to return to the Dashboard</a>.', 'envira-gallery' ), get_admin_url() ) );
-    }
-
-    if ( is_multisite() && $network_wide ) {
-        global $wpdb;
-        $site_list = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->blogs ORDER BY blog_id" ) );
-        foreach ( (array) $site_list as $site ) {
-            switch_to_blog( $site->blog_id );
-
-            $option = get_option( 'envira_gallery_lite_limit' );
-            if ( ! $option || empty( $option ) ) {
-                update_option( 'envira_gallery_lite_limit', array() );
-            }
-
-            restore_current_blog();
-        }
-    } else {
-        $option = get_option( 'envira_gallery_lite_limit' );
-        if ( ! $option || empty( $option ) ) {
-            update_option( 'envira_gallery_lite_limit', array() );
-        }
-    }
-
-}
-
-register_uninstall_hook(  __FILE__, 'envira_gallery_lite_uninstall_hook'  );
-/**
- * Fired when the plugin is uninstalled.
- *
- * @since 1.0.0
- *
- * @global object $wpdb The WordPress database object.
- */
-function envira_gallery_lite_uninstall_hook() {
-
-    if ( is_multisite() ) {
-        global $wpdb;
-        $site_list = $wpdb->get_results( "SELECT * FROM $wpdb->blogs ORDER BY blog_id" );
-        foreach ( (array) $site_list as $site ) {
-            switch_to_blog( $site->blog_id );
-            delete_option( 'envira_gallery_lite_limit' );
-            restore_current_blog();
-        }
-    } else {
-        delete_option( 'envira_gallery_lite_limit' );
     }
 
 }

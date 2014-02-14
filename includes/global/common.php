@@ -131,86 +131,6 @@ class Envira_Gallery_Common_Lite {
     }
 
     /**
-     * Helper method for retrieving title displays.
-     *
-     * @since 1.0.0
-     *
-     * @return array Array of title display data.
-     */
-    public function get_title_displays() {
-
-        $displays = array(
-            array(
-                'value' => 'float',
-                'name'  => __( 'Float', 'envira-gallery' )
-            ),
-            array(
-                'value' => 'inside',
-                'name'  => __( 'Inside', 'envira-gallery' )
-            ),
-            array(
-                'value' => 'outside',
-                'name'  => __( 'Outside', 'envira-gallery' )
-            ),
-            array(
-                'value' => 'over',
-                'name'  => __( 'Over', 'envira-gallery' )
-            )
-        );
-
-        return apply_filters( 'envira_gallery_title_displays', $displays );
-
-    }
-
-    /**
-     * Helper method for retrieving toolbar positions.
-     *
-     * @since 1.0.0
-     *
-     * @return array Array of toolbar position data.
-     */
-    public function get_toolbar_positions() {
-
-        $positions = array(
-            array(
-                'value' => 'top',
-                'name'  => __( 'Top', 'envira-gallery' )
-            ),
-            array(
-                'value' => 'bottom',
-                'name'  => __( 'Bottom', 'envira-gallery' )
-            )
-        );
-
-        return apply_filters( 'envira_gallery_toolbar_positions', $positions );
-
-    }
-
-    /**
-     * Helper method for retrieving thumbnail positions.
-     *
-     * @since 1.0.0
-     *
-     * @return array Array of thumbnail position data.
-     */
-    public function get_thumbnail_positions() {
-
-        $positions = array(
-            array(
-                'value' => 'top',
-                'name'  => __( 'Top', 'envira-gallery' )
-            ),
-            array(
-                'value' => 'bottom',
-                'name'  => __( 'Bottom', 'envira-gallery' )
-            )
-        );
-
-        return apply_filters( 'envira_gallery_thumbnail_positions', $positions );
-
-    }
-
-    /**
      * Helper method for setting default config values.
      *
      * @since 1.0.0
@@ -237,10 +157,6 @@ class Envira_Gallery_Common_Lite {
             'crop'                => 0,
             'crop_width'          => 960,
             'crop_height'         => 300,
-            'mobile'              => 0,
-            'mobile_width'        => 600,
-            'mobile_height'       => 200,
-            'title_display'       => 'float',
             'arrows'              => 1,
             'keyboard'            => 1,
             'mousewheel'          => 1,
@@ -248,10 +164,6 @@ class Envira_Gallery_Common_Lite {
             'toolbar'             => 0,
             'toolbar_position'    => 'top',
             'loop'                => 1,
-            'thumbnails'          => 0,
-            'thumbnails_width'    => 75,
-            'thumbnails_height'   => 50,
-            'thumbnails_position' => 'bottom',
             'classes'             => array(),
             'title'               => '',
             'slug'                => ''

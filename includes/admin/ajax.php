@@ -166,9 +166,8 @@ function envira_gallery_lite_ajax_insert_images() {
     check_ajax_referer( 'envira-gallery-insert-images', 'nonce' );
 
     // Prepare variables.
-    $images  = stripslashes_deep( $_POST['images'] );
+    $images  = stripslashes_deep( (array) $_POST['images'] );
     $post_id = absint( $_POST['post_id'] );
-    $html    = '';
 
     // Grab and update any gallery data if necessary.
     $in_gallery = get_post_meta( $post_id, '_eg_in_gallery', true );

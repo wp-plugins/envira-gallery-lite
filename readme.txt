@@ -55,6 +55,14 @@ Envira Gallery is absolutely, positively the [best responsive WordPress gallery 
 
 == Changelog ==
 
+= 1.0.4 =
+* No more gallery limit restrictions. You can now create as many galleries as you want.
+* Features not accessible in Lite version are now removed from display.
+* Fixed bug with gallery not resizing properly on window resize.
+* Updated the uploader script to reduce outside conflicts.
+* Better style support for the gallery display.
+* Numerous other bug fixes and improvements.
+
 = 1.0.3.1 =
 * Flush gallery caches when interacting with meta.
 * Fixed Isotope init on resize.

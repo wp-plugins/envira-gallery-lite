@@ -92,7 +92,8 @@ class Envira_Gallery_Media_Lite {
 
         // Prepare globals and variables.
         global $is_IE, $is_opera;
-        $sizes = array( 'KB', 'MB', 'GB' );
+        $sizes           = array( 'KB', 'MB', 'GB' );
+        $max_upload_size = wp_max_upload_size();
 
         ?>
         <script type="text/javascript">var resize_width = <?php echo $width; ?>, resize_height = <?php echo $height; ?>;</script>

@@ -55,6 +55,9 @@ Envira Gallery is absolutely, positively the [best responsive WordPress gallery 
 
 == Changelog ==
 
+= 1.0.6 =
+* Added hash support for settings tabs.
+
 = 1.0.5 =
 * Fixed undefined index notice with media max_upload_size variable.
 

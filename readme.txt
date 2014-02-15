@@ -55,6 +55,9 @@ Envira Gallery is absolutely, positively the [best responsive WordPress gallery 
 
 == Changelog ==
 
+= 1.0.6.1 =
+* Ensure post form is available before setting post hash.
+
 = 1.0.6 =
 * Added hash support for settings tabs.
 

@@ -31,8 +31,11 @@
             envira_tabs.find(envira_tabs_hash_sani).addClass('envira-active').show();
 
             // Update the post action to contain our hash so the proper tab can be loaded on save.
-            var post_action = $('#post').attr('action').split('#')[0];
-            $('#post').attr('action', post_action + envira_tabs_hash);
+            var post_action = $('#post').attr('action');
+            if ( post_action ) {
+                post_action = post_action.split('#')[0];
+                $('#post').attr('action', post_action + envira_tabs_hash);
+            }
         }
 
         // Change tabs on click.
@@ -49,8 +52,11 @@
                 envira_tabs.find($this.attr('href')).addClass('envira-active').show();
 
                 // Update the post action to contain our hash so the proper tab can be loaded on save.
-                var post_action = $('#post').attr('action').split('#')[0];
-                $('#post').attr('action', post_action + envira_tabs_hash);
+                var post_action = $('#post').attr('action');
+                if ( post_action ) {
+                    post_action = post_action.split('#')[0];
+                    $('#post').attr('action', post_action + envira_tabs_hash);
+                }
             }
         });
 

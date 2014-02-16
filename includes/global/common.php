@@ -207,6 +207,11 @@ class Envira_Gallery_Common_Lite {
             extract( $common );
         }
 
+        // If the destination width/height values are the same as the original, don't do anything.
+        if ( $orig_width === $dest_width && $orig_height === $dest_height ) {
+            return $url;
+        }
+
         // If the file doesn't exist yet, we need to create it.
         if ( ! file_exists( $dest_file_name ) ) {
             // We only want to resize Media Library images, so we can be sure they get deleted correctly when appropriate.

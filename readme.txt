@@ -1,6 +1,6 @@
 === Responsive WordPress Gallery - Envira Gallery Lite ===
 Contributors: griffinjt
-Tags: wordpress gallery, gallery, wordpress gallery plugin, gallery plugin, responsive, responsive gallery, image gallery, image gallery plugin, responsive gallery plugin, responsive image gallery, responsive image gallery plugin, custom post types, slideshow, responsive slideshow, slideshow plugin, responsive slideshow plugin, rotator, image rotator, responsive rotator, jquery gallery, javascript gallery, jquery rotator, javascript rotator, picture gallery, photo gallery, photo rotator, shortcode, template tag, custom post type, media uploader, ajax, wordpress galleries, responsive galleries, fullscreen, deeplinking, responsive wordpress photo gallery, photo gallery, slide gallery, slideshow gallery, wordpress picture, wordpress picture gallery
+Tags: wordpress gallery, gallery, wordpress gallery plugin, gallery plugin, responsive, responsive gallery, image gallery, image gallery plugin, responsive gallery plugin, responsive image gallery, responsive image gallery plugin, custom post types, slideshow, responsive slideshow, slideshow plugin, responsive slideshow plugin, rotator, image rotator, responsive rotator, jquery gallery, javascript gallery, jquery rotator, javascript rotator, picture gallery, photo gallery, photo rotator, shortcode, template tag, custom post type, media uploader, ajax, wordpress galleries, responsive galleries, fullscreen, deeplinking
 Requires at least: 3.8
 Tested up to: 3.9
 Stable tag: trunk
@@ -54,6 +54,10 @@ You can get access to more features, Addons and support by [visiting the Envira 
 Envira Gallery is absolutely, positively the [best responsive WordPress gallery plugin](http://enviragallery.com/?utm_source=orgrepo&utm_medium=link&utm_campaign=WordPress) on the market. It is fast, flexible and allows you to create insanely powerful responsive WordPress galleries with half of the effort. Envira Gallery gets out of your way so you can showcase your content in beautiful and powerful ways.
 
 == Changelog ==
+
+= 1.0.7 =
+* Don’t crop images where the original and destination dimensions match.
+* Ensure to restrain thumbnail views.
 
 = 1.0.6.1 =
 * Ensure post form is available before setting post hash.

@@ -383,9 +383,13 @@ class Envira_Gallery_Shortcode_Lite {
     public function get_image_src( $id, $item, $data, $mobile = false ) {
 
         // Get the full image src. If it does not return the data we need, return the image link instead.
-        $image = ! empty( $item['src'] ) ? $item['src'] : false;
+        $src   = wp_get_attachment_image_src( $id, 'full' );
+        $image = ! empty( $src[0] ) ? $src[0] : false;
         if ( ! $image ) {
-            return apply_filters( 'envira_gallery_no_image_src', $item['link'], $id, $item, $data );
+            $image = ! empty( $item['src'] ) ? $item['src'] : false;
+            if ( ! $image ) {
+                return apply_filters( 'envira_gallery_no_image_src', $item['link'], $id, $item, $data );
+            }
         }
 
         // Generate the cropped image if necessary.

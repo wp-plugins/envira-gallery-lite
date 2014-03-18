@@ -76,7 +76,6 @@
         if ( envira_uploader ) {
             envira_uploader.bind('Init', function(up) {
     			var uploaddiv = $('#envira-gallery-plupload-upload-ui');
-    			enviraSetResize( getUserSetting( 'upload_resize', false ) );
 
                 // If drag and drop, make that happen.
     			if ( up.features.dragdrop && ! $(document.body).hasClass('mobile') ) {
@@ -549,7 +548,13 @@
                     if ( res && res.success ) {
                         $('#envira-gallery-output').html(res.success);
                         $('#envira-gallery-output').find('.wp-editor-wrap').each(function(i, el){
-                            var id = $(el).attr('id').split('-')[4];
+                            var qt = $(el).find('.quicktags-toolbar');
+                            if ( qt.length > 0 ) {
+                                return;
+                            }
+
+                            var arr = $(el).attr('id').split('-'),
+                                id  = arr.slice(4, -1).join('-');
                             quicktags({id: 'envira-gallery-title-' + id, buttons: 'strong,em,link,ul,ol,li,close'});
                             QTags._buttonsInit(); // Force buttons to initialize.
                         });
@@ -596,20 +601,6 @@
                 else
                     $('#envira-config-lightbox-toolbar-position-box').fadeOut(300);
             });
-        }
-
-        // Function for setting resize.
-        function enviraSetResize( arg ) {
-            if ( arg ) {
-                if ( envira_uploader.features.jpgresize ) {
-        			envira_uploader.settings.resize = { width: resize_width, height: resize_height, quality: 100 };
-        		} else {
-        			envira_uploader.settings.multipart_params.image_resize = true;
-                }
-            } else {
-                delete(envira_uploader.settings.resize);
-                delete(envira_uploader.settings.multipart_params.image_resize);
-            }
         }
 
         // Function for displaying file upload errors.

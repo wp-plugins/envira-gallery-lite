@@ -1,6 +1,6 @@
 === Responsive WordPress Gallery - Envira Gallery Lite ===
 Contributors: griffinjt
-Tags: wordpress gallery, gallery, wordpress gallery plugin, gallery plugin, responsive, responsive gallery, image gallery, image gallery plugin, responsive gallery plugin, responsive image gallery, responsive image gallery plugin, custom post types, slideshow, responsive slideshow, slideshow plugin, responsive slideshow plugin, rotator, image rotator, responsive rotator, jquery gallery, javascript gallery, jquery rotator, javascript rotator, picture gallery, photo gallery, photo rotator, shortcode, template tag, custom post type, media uploader, ajax, wordpress galleries, responsive galleries, fullscreen, deeplinking, wordpress responsive gallery plugin, image gallery, picture gallery, gallery, wordpress picture gallery, responsive wordpress photo gallery, responsive photo gallery
+Tags: wordpress gallery, gallery, wordpress gallery plugin, gallery plugin, responsive, responsive gallery, image gallery, image gallery plugin, responsive gallery plugin, responsive image gallery, responsive image gallery plugin, custom post types, slideshow, responsive slideshow, slideshow plugin, responsive slideshow plugin, rotator, image rotator, responsive rotator, jquery gallery, javascript gallery, jquery rotator, javascript rotator, picture gallery, photo gallery, photo rotator, shortcode, template tag, custom post type, media uploader, ajax, wordpress galleries, responsive galleries, fullscreen, deeplinking
 Requires at least: 3.8
 Tested up to: 3.9
 Stable tag: trunk
@@ -54,6 +54,11 @@ You can get access to more features, Addons and support by [visiting the Envira 
 Envira Gallery is absolutely, positively the [best responsive WordPress gallery plugin](http://enviragallery.com/?utm_source=orgrepo&utm_medium=link&utm_campaign=WordPress) on the market. It is fast, flexible and allows you to create insanely powerful responsive WordPress galleries with half of the effort. Envira Gallery gets out of your way so you can showcase your content in beautiful and powerful ways.
 
 == Changelog ==
+
+= 1.0.8 =
+* Fixed bug where URLs would not switch over if migrating to a new site.
+* Fixed bug with image uploader and WordPress 3.9.
+* Fixed bug with Quicktags duplicating for image uploaded with the drag-and-drop uploader.
 
 = 1.0.7 =
 * Don’t crop images where the original and destination dimensions match.

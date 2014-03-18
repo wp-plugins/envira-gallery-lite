@@ -194,8 +194,8 @@ class Envira_Gallery_Metaboxes_Lite {
         	'urlstream_upload'    => true,
         	'multipart_params'    => $post_params,
         	'resize'              => array(
-        	    'width'   => Envira_Gallery_Media::get_instance()->get_resize_width(),
-        	    'height'  => Envira_Gallery_Media::get_instance()->get_resize_height(),
+        	    'width'   => Envira_Gallery_Media_Lite::get_instance()->get_resize_width(),
+        	    'height'  => Envira_Gallery_Media_Lite::get_instance()->get_resize_height(),
         	    'quality' => 100,
         	    'enabled' => true
         	)

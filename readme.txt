@@ -55,6 +55,9 @@ Envira Gallery is absolutely, positively the [best responsive WordPress gallery 
 
 == Changelog ==
 
+= 1.0.8.1 =
+* Fixed fatal error with calling wrong class name.
+
 = 1.0.8 =
 * Fixed bug where URLs would not switch over if migrating to a new site.
 * Fixed bug with image uploader and WordPress 3.9.

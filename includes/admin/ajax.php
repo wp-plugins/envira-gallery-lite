@@ -83,7 +83,7 @@ function envira_gallery_lite_ajax_load_library() {
 
     // Prepare variables.
     $offset  = (int) $_POST['offset'];
-    $post_id = absint( $_POST['id'] );
+    $post_id = absint( $_POST['post_id'] );
     $html    = '';
 
     // Grab the library contents with the included offset parameter.
@@ -307,7 +307,7 @@ function envira_gallery_lite_ajax_save_meta() {
     check_ajax_referer( 'envira-gallery-save-meta', 'nonce' );
 
     // Prepare variables.
-    $post_id      = absint( $_POST['id'] );
+    $post_id      = absint( $_POST['post_id'] );
     $attach_id    = absint( $_POST['attach_id'] );
     $meta         = $_POST['meta'];
     $gallery_data = get_post_meta( $post_id, '_eg_gallery_data', true );
@@ -350,7 +350,7 @@ function envira_gallery_lite_ajax_refresh() {
     check_ajax_referer( 'envira-gallery-refresh', 'nonce' );
 
     // Prepare variables.
-    $post_id = absint( $_POST['id'] );
+    $post_id = absint( $_POST['post_id'] );
     $gallery = '';
 
     // Grab all gallery data.
@@ -381,7 +381,7 @@ add_action( 'wp_ajax_envira_gallery_load_gallery_data', 'envira_gallery_lite_aja
 function envira_gallery_lite_ajax_load_gallery_data() {
 
     // Prepare variables and grab the gallery data.
-    $gallery_id   = absint( $_POST['id'] );
+    $gallery_id   = absint( $_POST['post_id'] );
     $gallery_data = get_post_meta( $gallery_id, '_eg_gallery_data', true );
 
     // Send back the gallery data.

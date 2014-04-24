@@ -296,13 +296,25 @@ class Envira_Gallery_Shortcode_Lite {
                     cyclic: true,
                     centerOnScroll: true,
                     <?php do_action( 'envira_gallery_api_config_callback', $data ); ?>
-                    onStart: function(){
+                    onStart: function(data, index, opts){
                         $(window).on({
                             'resize' : function(){
                                 $.fancybox.resize();
                                 $.fancybox.center();
                             }
                         });
+
+                        var obj  = data[index],
+                            href = opts.href || (obj.nodeName ? $(obj).attr('href') : obj.href) || null;
+
+                        if ((/^(?:javascript)/i).test(href) || href == '#') {
+                            href = null;
+                        }
+
+                        if ( href && ! href.match(/\.(jpg|gif|png|bmp|jpeg)(.*)?$/i) ) {
+                            window.location.href = href;
+                            return false;
+                        }
                     }
                 });
 

@@ -164,11 +164,11 @@ class Envira_Gallery_Shortcode_Lite {
 
                     if ( ! empty( $item['link'] ) ) {
                         $output  = apply_filters( 'envira_gallery_output_before_link', $output, $id, $item, $data, $i );
-                        $output .= '<a href="' . esc_url( $item['link'] ) . '" class="envira-gallery-' . sanitize_html_class( $data['id'] ) . ' envira-gallery-link" rel="enviragallery' . sanitize_html_class( $data['id'] ) . '" title="' . esc_attr( $item['title'] ) . '" data-thumbnail="' . esc_url( $item['thumb'] ) . '">';
+                        $output .= '<a href="' . esc_url( $item['link'] ) . '" class="envira-gallery-' . sanitize_html_class( $data['id'] ) . ' envira-gallery-link" rel="enviragallery' . sanitize_html_class( $data['id'] ) . '" title="' . strip_tags( html_entity_decode( $item['title'] ) ) . '" data-thumbnail="' . esc_url( $item['thumb'] ) . '">';
                     }
 
                             $output  = apply_filters( 'envira_gallery_output_before_image', $output, $id, $item, $data, $i );
-                            $output .= '<img id="envira-gallery-image-' . sanitize_html_class( $id ) . '" class="envira-gallery-image envira-gallery-preload envira-gallery-image-' . $i . '" src="' . esc_url( plugins_url( 'assets/css/images/holder.gif', dirname( dirname( __FILE__ ) ) ) ) . '" data-envira-src="' . esc_url( $imagesrc ) . '" alt="' . esc_attr( $item['title'] ) . '" ' . apply_filters( 'envira_gallery_output_image_attr', '', $id, $item, $data, $i ) . ' />';
+                            $output .= '<img id="envira-gallery-image-' . sanitize_html_class( $id ) . '" class="envira-gallery-image envira-gallery-preload envira-gallery-image-' . $i . '" src="' . esc_url( plugins_url( 'assets/css/images/holder.gif', dirname( dirname( __FILE__ ) ) ) ) . '" data-envira-src="' . esc_url( $imagesrc ) . '" alt="' . esc_attr( $item['title'] ) . '" title="' . strip_tags( html_entity_decode( $item['title'] ) ) . '" ' . apply_filters( 'envira_gallery_output_image_attr', '', $id, $item, $data, $i ) . ' />';
                             $output  = apply_filters( 'envira_gallery_output_after_image', $output, $id, $item, $data, $i );
 
                         if ( ! empty( $item['link'] ) ) {

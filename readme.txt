@@ -55,6 +55,10 @@ Envira Gallery is absolutely, positively the <a href="http://enviragallery.com/?
 
 == Changelog ==
 
+= 1.1.0 =
+* Fixed bug with HTML being output on image hover for title attribute.
+* Fixed bug with internal link dialog being shown below the edit metadata modal window.
+
 = 1.0.9 =
 * Fixed JS error issues with WordPress 3.9.
 * Added ability to link to external URLs in images.

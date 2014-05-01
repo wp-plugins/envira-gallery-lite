@@ -306,11 +306,17 @@
                 e.preventDefault();
                 $('#' + formfield).appendTo('#' + attach_id).hide();
                 envira_main_frame = false;
+                $(document).off('click.enviraLink');
             };
             $(document).on('click.enviraIframe', '.media-modal-close, .media-modal-backdrop', append_and_hide);
             $(document).on('keydown.enviraIframe', function(e){
                 if ( 27 == e.keyCode && envira_main_frame )
                     append_and_hide(e);
+            });
+            $(document).on('click.enviraLink', '.ed_button', function(){
+                // Set custom z-index for link dialog box.
+                $('#wp-link-backdrop').css('zIndex', '170100');
+                $('#wp-link-wrap').css('zIndex', '171005' );
             });
         });
 

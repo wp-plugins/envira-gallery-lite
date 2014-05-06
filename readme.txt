@@ -29,7 +29,7 @@ _It's hard to go wrong by choosing <a href="http://enviragallery.com/?utm_source
 
 == Installation ==
 
-1. Install Envira Gallery Lite either via the WordPress.org plugin repository, or by uploading the files to your server.
+1. Install Envira Gallery Lite either via the WordPress.org plugin repository or by uploading the files to your server.
 2. Activate Envira Gallery Lite.
 3. Navigate to the Envira Gallery tab at the bottom of your admin menu and click "Add New" to begin creating your new WordPress gallery, or you can create a new gallery directly inside the post/page/custom post type of your choice.
 4. Salivate for new features and <a href="http://enviragallery.com/?utm_source=orgrepo&utm_medium=link&utm_campaign=WordPress" rel="friend" title="Envira Gallery">purchase the full version of Envira Gallery</a>!

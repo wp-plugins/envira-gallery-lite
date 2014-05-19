@@ -333,7 +333,7 @@
             $this.text(envira_gallery_metabox.saving);
 
             // Add the title since it is a special field.
-            meta.caption = $('#envira-gallery-meta-table-' + attach_id).find('textarea[name="_envira_gallery[meta_caption]"]').val();
+            meta.title = $('#envira-gallery-meta-table-' + attach_id).find('textarea[name="_envira_gallery[meta_title]"]').val();
 
             // Get all meta fields and values.
             $('#envira-gallery-meta-table-' + attach_id).find(':input').not('.ed_button').each(function(i, el){

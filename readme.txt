@@ -51,7 +51,7 @@ You can get access to more features, Addons and support by <a href="http://envir
 
 == Notes ==
 
-Envira Gallery is absolutely, positively the <a href="http://enviragallery.com/?utm_source=orgrepo&utm_medium=link&utm_campaign=WordPress" rel="friend" title="Click here to purchase the best responsive WordPress gallery plugin now!">best responsive WordPress gallery plugin</a> on the market. It is fast, flexible and allows you to create insanely powerful responsive WordPress galleries with half of the effort. Envira Gallery gets out of your way so you can showcase your content in beautiful and powerful ways.
+Envira Gallery is absolutely, positively the <a href="http://enviragallery.com/?utm_source=orgrepo&utm_medium=link&utm_campaign=WordPress" rel="friend" title="Click here to purchase the best responsive WordPress gallery plugin now!">best responsive WordPress gallery plugin</a> on the market. It is fast, flexible and allows you to create insanely powerful <a href="http://enviragallery.com/?utm_source=orgrepo&utm_medium=link&utm_campaign=WordPress" rel="friend" title="Click here to purchase the best responsive WordPress gallery plugin now!">responsive WordPress galleries</a> with half of the effort. Envira Gallery gets out of your way so you can showcase your content in beautiful and powerful ways.
 
 == Changelog ==
 

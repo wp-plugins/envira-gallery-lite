@@ -53,9 +53,12 @@ You can get access to more features, Addons and support by <a href="http://envir
 
 Envira Gallery is absolutely, positively the <a href="http://enviragallery.com/?utm_source=orgrepo&utm_medium=link&utm_campaign=WordPress" rel="friend" title="Click here to purchase the best responsive WordPress gallery plugin now!">best responsive WordPress gallery plugin</a> on the market. It is fast, flexible and allows you to create insanely powerful <a href="http://enviragallery.com/?utm_source=orgrepo&utm_medium=link&utm_campaign=WordPress" rel="friend" title="Click here to purchase the best responsive WordPress gallery plugin now!">responsive WordPress galleries</a> with half of the effort. Envira Gallery gets out of your way so you can showcase your content in beautiful and powerful ways.
 
-Also, I'm an <a href="http://thomasgriffin.io" rel="me" title="WordPress Developer - Thomas Griffin">expert WordPress developer</a> and I write a lot about WordPress in general. You can check out my blog at the link above.
+Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Developer - Thomas Griffin">expert WordPress developer</a> and I write a lot about WordPress in general. You can check out my blog at the link above.
 
 == Changelog ==
+
+= 1.1.1 =
+* Compatibility updates with WordPress 4.1.
 
 = 1.1.0.1 =
 * Fixed bug with saving image titles.

@@ -73,14 +73,6 @@ class Envira_Gallery_Metaboxes_Lite {
      */
     public function meta_box_styles() {
 
-        if ( 'post' !== get_current_screen()->base ) {
-            return;
-        }
-
-        if ( isset( get_current_screen()->post_type ) && in_array( get_current_screen()->post_type, $this->get_skipped_posttypes() ) ) {
-            return;
-        }
-
         // Load necessary metabox styles.
         wp_register_style( $this->base->plugin_slug . '-metabox-style', plugins_url( 'assets/css/metabox.css', $this->base->file ), array(), $this->base->version );
         wp_enqueue_style( $this->base->plugin_slug . '-metabox-style' );

@@ -2,7 +2,7 @@
 Contributors: griffinjt
 Tags: wordpress gallery, gallery, wordpress gallery plugin, gallery plugin, responsive, responsive gallery, image gallery, image gallery plugin, responsive gallery plugin, responsive image gallery, responsive image gallery plugin, custom post types, slideshow, responsive slideshow, slideshow plugin, responsive slideshow plugin, rotator, image rotator, responsive rotator, jquery gallery, javascript gallery, jquery rotator, javascript rotator, picture gallery, photo gallery, photo rotator, shortcode, template tag, custom post type, media uploader, ajax, wordpress galleries, responsive galleries, fullscreen, deeplinking, best wordpress gallery, best wordpress gallery plugin, best gallery plugin, best gallery, best responsive gallery, best responsive wordpress gallery, best wp gallery
 Requires at least: 3.8
-Tested up to: 4.0.1
+Tested up to: 4.1
 Stable tag: trunk
 License: GNU General Public License v2.0 or later
 
@@ -56,6 +56,9 @@ Envira Gallery is absolutely, positively the <a href="http://enviragallery.com/?
 Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Developer - Thomas Griffin">expert WordPress developer</a> and I write a lot about WordPress in general. You can check out my blog at the link above.
 
 == Changelog ==
+
+= 1.1.3 =
+* Fix: Enable HTML captions
 
 = 1.1.2 =
 * Fix: WordPress 4.0 support for Add Slider attachment window

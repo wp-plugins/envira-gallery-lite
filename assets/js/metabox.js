@@ -310,8 +310,9 @@
             };
             $(document).on('click.enviraIframe', '.media-modal-close, .media-modal-backdrop', append_and_hide);
             $(document).on('keydown.enviraIframe', function(e){
-                if ( 27 == e.keyCode && envira_main_frame )
-                    append_and_hide(e);
+                if ( 27 == e.keyCode && envira_main_frame ) {
+                	append_and_hide(e);
+                }
             });
             $(document).on('click.enviraLink', '.ed_button', function(){
                 // Set custom z-index for link dialog box.

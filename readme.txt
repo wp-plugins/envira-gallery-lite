@@ -57,6 +57,10 @@ Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Develo
 
 == Changelog ==
 
+= 1.1.4 =
+* Added: Metadata - Image Alt Text Helpful Tip
+* Fix: Metadata - wp_editor too large for smaller screen resolutions
+
 = 1.1.3 =
 * Fix: Enable HTML captions
 

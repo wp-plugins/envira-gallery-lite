@@ -109,7 +109,7 @@ class Envira_Gallery_Metaboxes_Lite {
         wp_enqueue_media( array( 'post' => $post_id ) );
 
         // Load necessary metabox scripts.
-        wp_register_script( $this->base->plugin_slug . '-metabox-script', plugins_url( 'assets/js/metabox.js', $this->base->file ), array( 'jquery', 'plupload-handlers', 'quicktags', 'jquery-ui-sortable' ), $this->base->version, true );
+        wp_register_script( $this->base->plugin_slug . '-metabox-script', plugins_url( 'assets/js/min/metabox-min.js', $this->base->file ), array( 'jquery', 'plupload-handlers', 'quicktags', 'jquery-ui-sortable' ), $this->base->version, true );
         wp_enqueue_script( $this->base->plugin_slug . '-metabox-script' );
         wp_localize_script(
             $this->base->plugin_slug . '-metabox-script',

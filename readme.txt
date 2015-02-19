@@ -57,6 +57,10 @@ Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Develo
 
 == Changelog ==
 
+= 1.1.5 =
+* Fix: Metadata - close window would not always work after uploading new images
+* Fix: Support single quotation character in Image Title
+
 = 1.1.4 =
 * Added: Metadata - Image Alt Text Helpful Tip
 * Fix: Metadata - wp_editor too large for smaller screen resolutions

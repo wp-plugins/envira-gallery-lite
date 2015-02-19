@@ -225,7 +225,7 @@ class Envira_Gallery_Shortcode_Lite {
 			           
 	            <?php
 	            foreach ( $data['gallery'] as $imageID => $image ) {
-		            $title = str_replace( "\n", "", nl2br( $image['title'] ) );
+		            $title = addslashes( str_replace( "\n", "", nl2br( $image['title'] ) ) );
 		            ?>
 		        	titles_<?php echo $data['id']; ?>.push('<?php echo $title; ?>');
 		        	<?php
@@ -472,27 +472,10 @@ class Envira_Gallery_Shortcode_Lite {
      *
      * @param string $string  String of data to minify.
      * @return string $string Minified string of data.
-    
-    public function minify( $string ) {
-	    
-	    return $string;
-
-        $clean = preg_replace( '/((?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:\/\/.*))/', '', $string );
-        $clean = str_replace( array( "\r\n", "\r", "\t", "\n", '  ', '    ', '     ' ), '', $clean );
-        return apply_filters( 'envira_gallery_minified_string', $clean, $string );
-
-    }
-     */
-    
-    /**
-     * Helper method to minify a string of data.
-     *
-     * @since 1.0.4
-     *
-     * @param string $string  String of data to minify.
-     * @return string $string Minified string of data.
      */
     public function minify( $string, $stripDoubleForwardslashes = true ) {
+
+        return $string;
 	    
 	    // Added a switch for stripping double forwardslashes
 	    // This can be disabled when using URLs in JS, to ensure http:// doesn't get removed

@@ -291,36 +291,49 @@
             );
         });
 
-        // Open up the media modal area for modifying gallery metadata.
-        $('#envira-gallery').on('click.enviraModify', '.envira-gallery-modify-image', function(e){
+        // Open up the media modal area for modifying gallery metadata when clicking the info icon
+        $('#envira-gallery').on('click', '.envira-gallery-modify-image', function(e){
             e.preventDefault();
             var attach_id = $(this).parent().data('envira-gallery-image'),
                 formfield = 'envira-gallery-meta-' + attach_id;
-
-            // Show the modal.
-            envira_main_frame = true;
-            $('#' + formfield).appendTo('body').show();
-
-            // Close the modal window on user action
-            var append_and_hide = function(e){
-                e.preventDefault();
-                $('#' + formfield).appendTo('#' + attach_id).hide();
-                envira_main_frame = false;
-                $(document).off('click.enviraLink');
-            };
-            $(document).on('click.enviraIframe', '.media-modal-close, .media-modal-backdrop', append_and_hide);
-            $(document).on('keydown.enviraIframe', function(e){
-                if ( 27 == e.keyCode && envira_main_frame ) {
-                	append_and_hide(e);
-                }
-            });
-            $(document).on('click.enviraLink', '.ed_button', function(){
-                // Set custom z-index for link dialog box.
-                $('#wp-link-backdrop').css('zIndex', '170100');
-                $('#wp-link-wrap').css('zIndex', '171005' );
-            });
+            
+            // Open modal
+            openModal(attach_id, formfield);    
         });
-
+        
+        // Open modal
+        var modal;
+        var openModal = function(attach_id, formfield) {
+	        
+            // Show the modal.
+            modal = $('#' + formfield).appendTo('body');
+            $(modal).show();
+            
+	        // Close modal on close button or background click
+	        $(document).on('click', '.media-modal-close, .media-modal-backdrop', function(e) {
+	            e.preventDefault();
+	            closeModal();
+	        });
+	        
+	        // Close modal on esc keypress
+	        $(document).on('keydown', function(e) {
+	            if ( 27 == e.keyCode ) {
+		        	closeModal();    
+	            }
+	        });
+        }
+        
+        // Close modal
+        var closeModal = function() {
+	        // Get modal
+			var formfield = $(modal).attr('id');
+			var formfieldArr = formfield.split('-');
+			var attach_id = formfieldArr[(formfieldArr.length-1)];
+            	
+            // Close modal
+	        $('#' + formfield).appendTo('#' + attach_id).hide();
+        }
+        
         // Save the gallery metadata.
         $(document).on('click', '.envira-gallery-meta-submit', function(e){
             e.preventDefault();

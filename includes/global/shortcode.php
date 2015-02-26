@@ -77,7 +77,7 @@ class Envira_Gallery_Shortcode_Lite {
         wp_register_style( $this->base->plugin_slug . '-style', plugins_url( 'assets/css/envira.css', $this->base->file ), array(), $this->base->version );
 
         // Register main gallery script.
-        wp_register_script( $this->base->plugin_slug . '-script', plugins_url( 'assets/js/envira.js', $this->base->file ), array( 'jquery' ), $this->base->version, true );
+        wp_register_script( $this->base->plugin_slug . '-script', plugins_url( 'assets/js/min/envira-min.js', $this->base->file ), array( 'jquery' ), $this->base->version, true );
 
         // Load hooks and filters.
         add_shortcode( 'envira-gallery', array( $this, 'shortcode' ) );
@@ -221,6 +221,17 @@ class Envira_Gallery_Shortcode_Lite {
                     envira_holder_<?php echo $data['id']; ?> = $('#envira-gallery-<?php echo $data['id']; ?>').find(".envira-gallery-preload"),
                     envira_throttle_<?php echo $data['id']; ?> = <?php echo apply_filters( 'envira_gallery_isotope_throttle', 500, $data ); ?>;
 
+				var titles_<?php echo $data['id']; ?> = [];
+			           
+	            <?php
+	            foreach ( $data['gallery'] as $imageID => $image ) {
+		            $title = addslashes( str_replace( "\n", "", nl2br( $image['title'] ) ) );
+		            ?>
+		        	titles_<?php echo $data['id']; ?>.push('<?php echo $title; ?>');
+		        	<?php
+	            }
+	            ?>
+
                 function enviraOnFinished<?php echo $data['id']; ?>(){
                     envira_container_<?php echo $data['id']; ?>.isotope('reLayout');
                     envira_container_<?php echo $data['id']; ?>.parent().css('background-image', 'none');
@@ -237,7 +248,7 @@ class Envira_Gallery_Shortcode_Lite {
                         envira_container_<?php echo $data['id']; ?>.css('overflow', 'visible');
                         <?php do_action( 'envira_gallery_api_enviratope_layout', $data ); ?>
                     }
-                }, enviraOnFinished<?php echo $data['id']; ?>);
+                });
 
                 var enviraApplyIsotope<?php echo $data['id']; ?> = enviraThrottle(function(){
                     envira_container_<?php echo $data['id']; ?>.isotope('reLayout');
@@ -290,8 +301,7 @@ class Envira_Gallery_Shortcode_Lite {
                 <?php do_action( 'envira_gallery_api_isotope', $data ); // Deprecated. ?>
                 <?php do_action( 'envira_gallery_api_enviratope', $data ); ?>
 
-
-                $('.envira-gallery-<?php echo $data['id']; ?>').fancybox({
+                $('.envira-gallery-<?php echo $data['id']; ?>').envirabox({
                     <?php do_action( 'envira_gallery_api_config', $data ); ?>
                     cyclic: true,
                     centerOnScroll: true,
@@ -299,8 +309,8 @@ class Envira_Gallery_Shortcode_Lite {
                     onStart: function(data, index, opts){
                         $(window).on({
                             'resize' : function(){
-                                $.fancybox.resize();
-                                $.fancybox.center();
+                                $.envirabox.resize();
+                                $.envirabox.center();
                             }
                         });
 
@@ -315,6 +325,8 @@ class Envira_Gallery_Shortcode_Lite {
                             window.location.href = href;
                             return false;
                         }
+                        
+                        opts.title = titles_<?php echo $data['id']; ?>[index];
                     }
                 });
 
@@ -323,7 +335,7 @@ class Envira_Gallery_Shortcode_Lite {
 
             // Minify before outputting to improve page load time.
             do_action( 'envira_gallery_api_end_global' );
-            echo $this->minify( ob_get_clean() ); ?>});</script>
+            echo $this->minify( ob_get_clean(), false ); ?>});</script>
         <?php
 
     }
@@ -461,10 +473,22 @@ class Envira_Gallery_Shortcode_Lite {
      * @param string $string  String of data to minify.
      * @return string $string Minified string of data.
      */
-    public function minify( $string ) {
+    public function minify( $string, $stripDoubleForwardslashes = true ) {
 
-        $clean = preg_replace( '/((?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:\/\/.*))/', '', $string );
-        $clean = str_replace( array( "\r\n", "\r", "\t", "\n", '  ', '    ', '     ' ), '', $clean );
+        return $string;
+	    
+	    // Added a switch for stripping double forwardslashes
+	    // This can be disabled when using URLs in JS, to ensure http:// doesn't get removed
+		// All other comment removal and minification will take place
+	    
+		if ( $stripDoubleForwardslashes ) {
+	    	$clean = preg_replace( '/((?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:\/\/.*))/', '', $string );
+	    } else {
+		    // Use less aggressive method
+		    $clean = preg_replace( '!/\*.*?\*/!s', '', $string );
+			$clean = preg_replace( '/\n\s*\n/', "\n", $clean );
+	    }
+	    
         return apply_filters( 'envira_gallery_minified_string', $clean, $string );
 
     }
@@ -473,7 +497,7 @@ class Envira_Gallery_Shortcode_Lite {
      * I'm sure some plugins mean well, but they go a bit too far trying to reduce
      * conflicts without thinking of the consequences.
      *
-     * 1. Prevents Foobox from completely borking Fancybox as if Foobox rules the world.
+     * 1. Prevents Foobox from completely borking Envirabox as if Foobox rules the world.
      *
      * @since 1.0.0
      */

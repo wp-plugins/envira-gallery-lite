@@ -623,7 +623,8 @@
                             wpQueueError(pluploadL10n.security_error);
                             break;
                         default:
-                            wpFileError(fileObj, pluploadL10n.default_error);
+                            enviraUploadError(up, error.file);
+                            break;
                     }
                     up.refresh();
                 });
@@ -634,13 +635,16 @@
         function enviraUploadError( up, file, over100mb ) {
             var message;
 
-        	if ( over100mb )
-        		message = pluploadL10n.big_upload_queued.replace('%s', file.name) + ' ' + pluploadL10n.big_upload_failed.replace('%1$s', '<a class="uploader-html" href="#">').replace('%2$s', '</a>');
-        	else
-        		message = pluploadL10n.file_exceeds_size_limit.replace('%s', file.name);
+            console.log('enviraUploadError');
 
-        	$('#envira-gallery-upload-error').html('<p class="error">' + message + '</p>');
-        	up.removeFile(file);
+            if ( over100mb ) {
+                message = pluploadL10n.big_upload_queued.replace('%s', file.name) + ' ' + pluploadL10n.big_upload_failed.replace('%1$s', '<a class="uploader-html" href="#">').replace('%2$s', '</a>');
+            } else {
+                message = pluploadL10n.file_exceeds_size_limit.replace('%s', file.name);
+            }
+
+            $('#envira-gallery-upload-error').html('<div class="error fade"><p>' + message + '</p></div>');
+            up.removeFile(file);
         }
     });
 }(jQuery));

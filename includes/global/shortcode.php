@@ -248,7 +248,7 @@ class Envira_Gallery_Shortcode_Lite {
                         envira_container_<?php echo $data['id']; ?>.css('overflow', 'visible');
                         <?php do_action( 'envira_gallery_api_enviratope_layout', $data ); ?>
                     }
-                }, enviraOnFinished<?php echo $data['id']; ?>);
+                });
 
                 var enviraApplyIsotope<?php echo $data['id']; ?> = enviraThrottle(function(){
                     envira_container_<?php echo $data['id']; ?>.isotope('reLayout');
@@ -301,7 +301,7 @@ class Envira_Gallery_Shortcode_Lite {
                 <?php do_action( 'envira_gallery_api_isotope', $data ); // Deprecated. ?>
                 <?php do_action( 'envira_gallery_api_enviratope', $data ); ?>
 
-                $('.envira-gallery-<?php echo $data['id']; ?>').fancybox({
+                $('.envira-gallery-<?php echo $data['id']; ?>').envirabox({
                     <?php do_action( 'envira_gallery_api_config', $data ); ?>
                     cyclic: true,
                     centerOnScroll: true,
@@ -309,8 +309,8 @@ class Envira_Gallery_Shortcode_Lite {
                     onStart: function(data, index, opts){
                         $(window).on({
                             'resize' : function(){
-                                $.fancybox.resize();
-                                $.fancybox.center();
+                                $.envirabox.resize();
+                                $.envirabox.center();
                             }
                         });
 
@@ -497,7 +497,7 @@ class Envira_Gallery_Shortcode_Lite {
      * I'm sure some plugins mean well, but they go a bit too far trying to reduce
      * conflicts without thinking of the consequences.
      *
-     * 1. Prevents Foobox from completely borking Fancybox as if Foobox rules the world.
+     * 1. Prevents Foobox from completely borking Envirabox as if Foobox rules the world.
      *
      * @since 1.0.0
      */

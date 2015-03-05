@@ -57,6 +57,11 @@ Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Develo
 
 == Changelog ==
 
+= 1.1.7 =
+* Fix: Minification of inline CSS and JS
+* Fix: Alt tags on images
+* Fix: Links on Lightbox Image Titles
+
 = 1.1.6 =
 * Fix: Upgraded Fancybox to 2.1.5
 * Fix: Improved error message UI when uploading files exceeding WordPress / PHP file size limits

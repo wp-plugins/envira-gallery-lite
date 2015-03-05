@@ -164,11 +164,11 @@ class Envira_Gallery_Shortcode_Lite {
 
                     if ( ! empty( $item['link'] ) ) {
                         $output  = apply_filters( 'envira_gallery_output_before_link', $output, $id, $item, $data, $i );
-                        $output .= '<a href="' . esc_url( $item['link'] ) . '" class="envira-gallery-' . sanitize_html_class( $data['id'] ) . ' envira-gallery-link" rel="enviragallery' . sanitize_html_class( $data['id'] ) . '" title="' . strip_tags( html_entity_decode( $item['title'] ) ) . '" data-thumbnail="' . esc_url( $item['thumb'] ) . '">';
+                        $output .= '<a href="' . esc_url( $item['link'] ) . '" class="envira-gallery-' . sanitize_html_class( $data['id'] ) . ' envira-gallery-link" rel="enviragallery' . sanitize_html_class( $data['id'] ) . '" title="' . esc_attr( $item['title'] ) . '" data-thumbnail="' . esc_url( $item['thumb'] ) . '">';
                     }
 
                             $output  = apply_filters( 'envira_gallery_output_before_image', $output, $id, $item, $data, $i );
-                            $output .= '<img id="envira-gallery-image-' . sanitize_html_class( $id ) . '" class="envira-gallery-image envira-gallery-preload envira-gallery-image-' . $i . '" src="' . esc_url( plugins_url( 'assets/css/images/holder.gif', dirname( dirname( __FILE__ ) ) ) ) . '" data-envira-src="' . esc_url( $imagesrc ) . '" alt="' . esc_attr( $item['title'] ) . '" title="' . strip_tags( html_entity_decode( $item['title'] ) ) . '" ' . apply_filters( 'envira_gallery_output_image_attr', '', $id, $item, $data, $i ) . ' />';
+                            $output .= '<img id="envira-gallery-image-' . sanitize_html_class( $id ) . '" class="envira-gallery-image envira-gallery-preload envira-gallery-image-' . $i . '" src="' . esc_url( plugins_url( 'assets/css/images/holder.gif', dirname( dirname( __FILE__ ) ) ) ) . '" data-envira-src="' . esc_url( $imagesrc ) . '" alt="' . esc_attr( $item['alt'] ) . '" title="' . esc_attr( $item['title'] ) . '" ' . apply_filters( 'envira_gallery_output_image_attr', '', $id, $item, $data, $i ) . ' />';
                             $output  = apply_filters( 'envira_gallery_output_after_image', $output, $id, $item, $data, $i );
 
                         if ( ! empty( $item['link'] ) ) {
@@ -220,17 +220,6 @@ class Envira_Gallery_Shortcode_Lite {
                     envira_on_render_<?php echo $data['id']; ?>,
                     envira_holder_<?php echo $data['id']; ?> = $('#envira-gallery-<?php echo $data['id']; ?>').find(".envira-gallery-preload"),
                     envira_throttle_<?php echo $data['id']; ?> = <?php echo apply_filters( 'envira_gallery_isotope_throttle', 500, $data ); ?>;
-
-				var titles_<?php echo $data['id']; ?> = [];
-			           
-	            <?php
-	            foreach ( $data['gallery'] as $imageID => $image ) {
-		            $title = addslashes( str_replace( "\n", "", nl2br( $image['title'] ) ) );
-		            ?>
-		        	titles_<?php echo $data['id']; ?>.push('<?php echo $title; ?>');
-		        	<?php
-	            }
-	            ?>
 
                 function enviraOnFinished<?php echo $data['id']; ?>(){
                     envira_container_<?php echo $data['id']; ?>.isotope('reLayout');
@@ -325,8 +314,9 @@ class Envira_Gallery_Shortcode_Lite {
                             window.location.href = href;
                             return false;
                         }
-                        
-                        opts.title = titles_<?php echo $data['id']; ?>[index];
+                    },
+                    beforeLoad: function(){
+                        this.title = $(this.element).attr('title');
                     }
                 });
 
@@ -476,7 +466,7 @@ class Envira_Gallery_Shortcode_Lite {
     public function minify( $string, $stripDoubleForwardslashes = true ) {
 
         return $string;
-	    
+
 	    // Added a switch for stripping double forwardslashes
 	    // This can be disabled when using URLs in JS, to ensure http:// doesn't get removed
 		// All other comment removal and minification will take place

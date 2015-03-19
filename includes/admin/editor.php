@@ -75,7 +75,7 @@ class Envira_Gallery_Editor_Lite {
         $button .= '<a id="envira-media-modal-button" href="#" class="button envira-gallery-choose-gallery" title="' . esc_attr__( 'Add Gallery', 'envira-gallery' ) . '" style="padding-left: .4em;"><span class="envira-media-icon" style="background: transparent url(' . plugins_url( 'assets/css/images/menu-icon.png', $this->base->file ) . ') no-repeat scroll 0 0; width: 16px; height: 16px; display: inline-block; vertical-align: text-top;"></span> ' . __( 'Add Gallery', 'envira-gallery' ) . '</a>';
 
         // Enqueue the script that will trigger the editor button.
-        wp_enqueue_script( $this->base->plugin_slug . '-editor-script', plugins_url( 'assets/js/editor.js', $this->base->file ), array( 'jquery' ), $this->base->version, true );
+        wp_enqueue_script( $this->base->plugin_slug . '-editor-script', plugins_url( 'assets/js/min/editor-min.js', $this->base->file ), array( 'jquery' ), $this->base->version, true );
 
         // Add the action to the footer to output the modal window.
         add_action( 'admin_footer', array( $this, 'gallery_selection_modal' ) );

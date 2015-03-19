@@ -57,6 +57,9 @@ Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Develo
 
 == Changelog ==
 
+= 1.1.9 =
+* Added: Minified editor JS
+
 = 1.1.8 =
 * Added: CSS minification for Administration CSS
 

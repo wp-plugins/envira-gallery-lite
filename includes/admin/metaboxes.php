@@ -73,14 +73,6 @@ class Envira_Gallery_Metaboxes_Lite {
      */
     public function meta_box_styles() {
 
-        if ( 'post' !== get_current_screen()->base ) {
-            return;
-        }
-
-        if ( isset( get_current_screen()->post_type ) && in_array( get_current_screen()->post_type, $this->get_skipped_posttypes() ) ) {
-            return;
-        }
-
         // Load necessary metabox styles.
         wp_register_style( $this->base->plugin_slug . '-metabox-style', plugins_url( 'assets/css/metabox.css', $this->base->file ), array(), $this->base->version );
         wp_enqueue_style( $this->base->plugin_slug . '-metabox-style' );
@@ -117,7 +109,7 @@ class Envira_Gallery_Metaboxes_Lite {
         wp_enqueue_media( array( 'post' => $post_id ) );
 
         // Load necessary metabox scripts.
-        wp_register_script( $this->base->plugin_slug . '-metabox-script', plugins_url( 'assets/js/metabox.js', $this->base->file ), array( 'jquery', 'plupload-handlers', 'quicktags', 'jquery-ui-sortable' ), $this->base->version, true );
+        wp_register_script( $this->base->plugin_slug . '-metabox-script', plugins_url( 'assets/js/min/metabox-min.js', $this->base->file ), array( 'jquery', 'plupload-handlers', 'quicktags', 'jquery-ui-sortable' ), $this->base->version, true );
         wp_enqueue_script( $this->base->plugin_slug . '-metabox-script' );
         wp_localize_script(
             $this->base->plugin_slug . '-metabox-script',
@@ -860,7 +852,15 @@ class Envira_Gallery_Metaboxes_Lite {
                                             <tr id="envira-gallery-title-box-<?php echo $id; ?>" valign="middle">
                                                 <th scope="row"><label for="envira-gallery-title-<?php echo $id; ?>"><?php _e( 'Image Title', 'envira-gallery' ); ?></label></th>
                                                 <td>
-                                                    <?php wp_editor( $data['title'], 'envira-gallery-title-' . $id, array( 'media_buttons' => false, 'tinymce' => false, 'textarea_name' => '_envira_gallery[meta_title]', 'quicktags' => array( 'buttons' => 'strong,em,link,ul,ol,li,close' ) ) ); ?>
+                                                    <?php 
+	                                                wp_editor( $data['title'], 'envira-gallery-title-' . $id, array( 
+	                                                	'media_buttons' => false, 
+	                                                	'tinymce' => false, 
+	                                                	'textarea_name' => '_envira_gallery[meta_title]', 
+	                                                	'quicktags' => array( 'buttons' => 'strong,em,link,ul,ol,li,close' ),
+	                                                	'textarea_rows' => 5,
+	                                                ) ); 
+	                                                ?>
                                                     <p class="description"><?php _e( 'Image titles can take any type of HTML.', 'envira-gallery' ); ?></p>
                                                 </td>
                                             </tr>
@@ -888,6 +888,8 @@ class Envira_Gallery_Metaboxes_Lite {
                                         <h3><?php _e( 'Helpful Tips', 'envira-gallery' ); ?></h3>
                                         <strong><?php _e( 'Image Titles', 'envira-gallery' ); ?></strong>
                                         <p><?php _e( 'Image titles can take any type of HTML. You can adjust the position of the titles in the main Lightbox settings.', 'envira-gallery' ); ?></p>
+                                        <strong><?php _e( 'Image Alt Text', 'envira-gallery' ); ?></strong>
+                                        <p><?php _e( 'The image alt text field is used for accessibility and SEO, and describes your image.', 'envira-gallery' ); ?></p>
                                         <strong><?php _e( 'Image Hyperlinks', 'envira-gallery' ); ?></strong>
                                         <p><?php _e( 'The image hyperlink field is used when you click on an image in the gallery. It determines what is displayed in the lightbox view. It could be a larger version of the image, a video, or some other form of content.', 'envira-gallery' ); ?></p>
                                         <strong><?php _e( 'Saving and Exiting', 'envira-gallery' ); ?></strong>

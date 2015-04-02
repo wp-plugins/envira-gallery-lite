@@ -57,6 +57,9 @@ Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Develo
 
 == Changelog ==
 
+= 1.2.1 =
+* Fix: Loading localization language files for some installations
+
 = 1.2.0 =
 * Added: .POT file for translation / localization support
 

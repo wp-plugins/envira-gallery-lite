@@ -383,6 +383,10 @@ a.envirabox-nav:hover {
     position: relative;
     text-shadow: none;
     z-index: 988090;
+
+    a {
+        color: #fff;
+    }
 }
 
 .envirabox-opened .envirabox-title {

@@ -251,6 +251,17 @@
 		"outputStyle": 1,
 		"syntaxCheckerStyle": 1
 		},
+	"\/assets\/js\/lib\/touchsupport.js": {
+		"fileType": 64,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/assets\/js\/lib\/touchsupport.js",
+		"outputAbbreviatedPath": "\/assets\/js\/lib\/min\/touchsupport-min.js",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 1,
+		"syntaxCheckerStyle": 1
+		},
 	"\/assets\/js\/metabox.js": {
 		"fileType": 64,
 		"ignore": 0,
@@ -261,6 +272,17 @@
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 1,
 		"syntaxCheckerStyle": 0
+		},
+	"\/assets\/js\/min\/editor-min.js": {
+		"fileType": 64,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/assets\/js\/min\/editor-min.js",
+		"outputAbbreviatedPath": "\/assets\/js\/min\/min\/editor-min-min.js",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 1,
+		"syntaxCheckerStyle": 1
 		},
 	"\/assets\/js\/min\/envira-min.js": {
 		"fileType": 64,
@@ -449,6 +471,12 @@
 			"followForSyntaxChecking": 1,
 			"linkedFileAbbreviatedPath": "\/assets\/js\/lib\/mousewheel.js",
 			"position": 2,
+			"type": 0
+			},
+		{
+			"followForSyntaxChecking": 1,
+			"linkedFileAbbreviatedPath": "\/assets\/js\/lib\/touchsupport.js",
+			"position": 3,
 			"type": 0
 			}
 		]

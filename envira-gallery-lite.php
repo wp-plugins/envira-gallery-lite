@@ -5,7 +5,7 @@
  * Description: Envira Gallery is best responsive WordPress gallery plugin. This is the lite version.
  * Author:      Thomas Griffin
  * Author URI:  http://thomasgriffinmedia.com
- * Version:     1.1.1
+ * Version:     1.2.3
  * Text Domain: envira-gallery
  * Domain Path: languages
  *
@@ -54,7 +54,7 @@ class Envira_Gallery_Lite {
      *
      * @var string
      */
-    public $version = '1.1.1';
+    public $version = '1.2.3';
 
     /**
      * The name of the plugin.
@@ -135,16 +135,7 @@ class Envira_Gallery_Lite {
      */
     public function load_plugin_textdomain() {
 
-        // Do nothing if the full version of Envira Gallery is already active.
-        if ( class_exists( 'Envira_Gallery' ) ) {
-            return;
-        }
-
-        $domain = $this->domain;
-        $locale = apply_filters( 'plugin_locale', get_locale(), $domain );
-
-        load_textdomain( $domain, WP_LANG_DIR . '/' . $domain . '/' . $domain . '-' . $locale . '.mo' );
-        load_plugin_textdomain( $domain, false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+        load_plugin_textdomain( $this->plugin_slug, false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 
     }
 

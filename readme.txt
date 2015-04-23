@@ -57,6 +57,9 @@ Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Develo
 
 == Changelog ==
 
+= 1.2.4 =
+* Fix: This Post's Gallery was missing when using the Add Gallery button
+
 = 1.2.3 =
 * Added: Mobile - lightbox arrows remain displayed on touchscreen devices, so it is clearer to the user how they can navigate through the images
 

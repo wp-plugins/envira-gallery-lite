@@ -132,6 +132,18 @@ class Envira_Gallery_Editor_Lite {
                             <div class="media-frame-content">
                                 <div class="attachments-browser">
                                     <ul class="envira-gallery-meta attachments" style="padding-left: 8px; top: 1em;">
+                                        <li class="attachment" data-envira-gallery-id="<?php echo absint( $post->ID ); ?>" style="margin: 8px;">
+                                            <div class="attachment-preview landscape">
+                                                <div class="thumbnail" style="display: table;">
+                                                    <div class="inside">
+                                                        <h3 style="margin: 0;color: #7ad03a;"><?php _e( 'This Post\'s Gallery', 'envira-gallery' ); ?></h3>
+                                                        <code style="color: #7ad03a;">[envira-gallery id="<?php echo absint( $post->ID ); ?>"]</code>
+                                                    </div>
+                                                </div>
+                                                <a class="check" href="#"><div class="media-modal-icon"></div></a>
+                                            </div>
+                                        </li>
+
                                         <?php foreach ( (array) $galleries as $gallery ) : if ( $post->ID == $gallery['id'] ) continue; ?>
                                         <li class="attachment" data-envira-gallery-id="<?php echo absint( $gallery['id'] ); ?>" style="margin: 8px;">
                                             <div class="attachment-preview landscape">

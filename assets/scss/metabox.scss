@@ -76,6 +76,31 @@
     color: #21759b;
 }
 
+/**
+* Types Nav
+*/
+#envira-gallery-types-nav {
+    margin: 10px 0;
+    padding: 10px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    
+    li {
+        float: left;
+        margin: 0 10px 0 0;
+    
+        &.envira-gallery-type-label {
+            margin-right: 20px;
+            
+            span {
+                font-weight: 700;
+                font-size: 13px;
+                vertical-align: middle;
+            }
+        }
+    }
+}
+
 #envira-gallery .envira-meta-close-text {
     display: none;
     color: #fff;
@@ -156,6 +181,14 @@
     padding-right: 0;
 }
 
+#envira-gallery .envira-tab tr {
+    td {
+        label {
+            margin: 0 10px 0 0;
+        }
+    }
+}
+
 #envira-gallery .envira-progress-bar {
     display: none;
     width: 100%;
@@ -222,6 +255,43 @@
     position: relative;
     width: 150px;
     height: 150px;
+
+    /**
+    * Selected Icon
+    */
+    a.check {
+        display: none;
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        width: 24px;
+        height: 24px;
+        background-color: #1e8cbe;
+        -webkit-box-shadow: 0 0 0 1px #fff,0 0 0 2px #1e8cbe;
+        box-shadow: 0 0 0 1px #fff,0 0 0 2px #1e8cbe;
+        
+        div.media-modal-icon {
+            width: 15px;
+            height: 15px;
+            margin: 5px 0 0 5px;
+            background-position: -21px 0;
+        }
+    }
+
+    /**
+    * Selected state
+    */
+    &.selected {
+        width: 148px;
+        height: 148px;
+        border: 2px solid #1e8cbe;
+        -webkit-box-shadow: inset 0 0 0 3px #fff,inset 0 0 0 7px #1e8cbe;
+        box-shadow: inset 0 0 0 3px #fff,inset 0 0 0 7px #1e8cbe;
+        
+        a.check {
+            display: block;
+        }
+    }
 }
 
 #envira-gallery #envira-gallery-output li.envira-gallery-status-pending {
@@ -296,8 +366,8 @@
 }
 
 #media-items .media-item img {
-    max-width: 150px;
-    max-height: 150px;
+    max-width: 164px;
+    max-height: 164px;
     float: none;
     margin: 4px;
     display: block;
@@ -309,12 +379,13 @@
 
 .envira-gallery-gallery .attachment {
     margin: 8px;
+    max-width: 164px;
 }
 
 .envira-gallery-gallery .attachment-preview,
 .envira-gallery-gallery .attachment-preview .thumbnail {
-    max-width: 150px;
-    max-height: 150px;
+    max-width: 164px;
+    max-height: 164px;
 }
 
 .envira-gallery-media-frame .max-upload-size {
@@ -327,7 +398,7 @@
 }
 
 .envira-gallery-media-frame .attachment.envira-gallery-in-gallery {
-    box-shadow: 0 0 0 1px #fff, 0 0 0 5px #519e0c;
+    box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 7px #519e0c;
 }
 
 .envira-gallery-media-frame .attachment.envira-gallery-in-gallery .attachment-preview,
@@ -379,50 +450,50 @@
 }
 
 .envira-gallery-meta.attachments .attachment {
-	width: 200px;
-	height: 200px;
-	border: none !important;
+    width: 200px;
+    height: 200px;
+    border: none !important;
 }
 
 .envira-gallery-meta.attachments .attachment.selected {
-	width: 200px;
-	height: 200px;
+    width: 200px;
+    height: 200px;
 }
 
 .envira-gallery-meta.attachments .attachment .attachment-preview {
-	width: 100%;
-	height: 100%;
-	border: none !important;
+    width: 100%;
+    height: 100%;
+    border: none !important;
 }
 
 .envira-gallery-meta.attachments .attachment .attachment-preview:before {
-	padding-top: 0;
-	border: none !important;
+    padding-top: 0;
+    border: none !important;
 }
 
 .envira-gallery-meta.attachments .attachment .attachment-preview .thumbnail {
-	display: table;
-	position: relative;
-	top: auto;
-	right: auto;
-	bottom: auto;
-	left: auto;
-	border: none !important;
+    display: table;
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    border: none !important;
 }
 
 .envira-gallery-meta.attachments .attachment .attachment-preview .thumbnail:after {
-	box-shadow: none;
-	-webkit-box-shadow: none;
-	-moz-box-shadow: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
 }
 
 .envira-gallery-meta.attachments .attachment .attachment-preview .thumbnail .inside {
-	display: table-cell;
-	width: 200px;
-	height: 200px;
-	text-align: center;
-	vertical-align: middle;
-	border: none !important;
+    display: table-cell;
+    width: 200px;
+    height: 200px;
+    text-align: center;
+    vertical-align: middle;
+    border: none !important;
 }
 
 .envira-gallery-ui-content {
@@ -513,6 +584,166 @@
 #envira-gallery .max-upload-size {
     display: block;
     margin: 10px 0;
+}
+
+/* ==========================================================================
+   Attachment Editor
+   ========================================================================== */
+
+.envira-gallery-meta-container {
+    /**
+    * Navigation Buttons
+    */
+    button.right {
+        border-right: 1px solid #ddd !important;
+    }
+    
+    /**
+    * Settings Labels + Fields
+    * - left align labels
+    * - increase width of text inputs
+    * - force inputs to drop to new line below ~ 960px viewport
+    */
+    .setting {
+        /**
+        * Label
+        */
+        span.name {
+            min-width: 20%;
+            text-align: left;
+        }
+        
+        /**
+        * Inputs
+        */
+        input[type=text] {
+            width: 75%;
+        }
+        textarea {
+            height: 150px;
+        }
+        
+        /**
+        * Visual Editor
+        */
+        .wp-editor-wrap {
+            float: right;
+            width: 75%;
+        }
+    }
+    
+    /**
+    * Links
+    */
+    #wp-link {
+        float: left;
+        width: 100%;
+        
+        #search-panel {
+            display: block;
+            float: left;
+            width: 100%;
+            
+            /**
+            * Search Box
+            */
+            .link-search-wrapper {
+                float: left;
+                width: 100%;
+                margin: 0;
+                
+                label {
+                    display: block;
+                    float: left;
+                    width: 100%;
+                    margin: 1px 0;
+                        
+                    span.name {
+                        display: none;
+                    }
+                    
+                    input {
+                        float: right;
+                        width: 75%;
+                        max-width: 75%;
+                    }
+                }
+            }
+            
+            /**
+            * Search Results
+            */
+            #search-results {
+                position: relative;
+                float: right;
+                width: 75%;
+                max-width: 75%;
+                margin: -2px 0 0 0;
+                display: block;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border: none;
+                border-left: 1px solid #dfdfdf;
+                border-bottom: 1px solid #dfdfdf;
+                border-right: 1px solid #dfdfdf;
+            }
+            
+            /**
+            * Most Recent Results
+            */
+            #most-recent-results {
+                display: none;
+            }
+        }
+    }
+    
+    /**
+    * Actions
+    */
+    div.actions {
+        a.button {
+            display: inline-block;
+        }
+    }
+}
+
+
+/**
+* Responsive Media Queries
+*/
+@media only screen and (max-width: 959px) {
+    .envira-gallery-meta-container {
+        .setting {
+            /**
+            * Label
+            */
+            span.name {
+                width: 100%;
+                max-width: 100%;
+                min-width: 100%;
+            }
+            
+            /**
+            * Inputs
+            */
+            input[type=text] {
+                width: 100%;
+            }
+            input[type=checkbox] {
+                clear: both;
+            }
+            
+            /**
+            * Visual Editor
+            */
+            .wp-editor-wrap {
+                float: left;
+                width: 100%;
+            }
+        }
+    }   
 }
 
 /* ==========================================================================

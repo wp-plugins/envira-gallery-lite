@@ -77,6 +77,14 @@ class Envira_Gallery_Metaboxes_Lite {
         wp_register_style( $this->base->plugin_slug . '-metabox-style', plugins_url( 'assets/css/metabox.css', $this->base->file ), array(), $this->base->version );
         wp_enqueue_style( $this->base->plugin_slug . '-metabox-style' );
 
+        // If WordPress version < 4.0, add attachment-details-modal-support.css
+        // This contains the 4.0 CSS to make the attachment window display correctly
+        $version = (float) get_bloginfo( 'version' );
+        if ( $version < 4 ) {
+            wp_register_style( $this->base->plugin_slug . '-attachment-details-modal-support', plugins_url( 'assets/css/attachment-details-modal-support.css', $this->base->file ), array(), $this->base->version );
+            wp_enqueue_style( $this->base->plugin_slug . '-attachment-details-modal-support' );
+        }
+
     }
 
     /**
@@ -468,7 +476,7 @@ class Envira_Gallery_Metaboxes_Lite {
                                     <div class="attachments-browser">
                                         <div class="media-toolbar envira-gallery-library-toolbar">
                                             <div class="media-toolbar-primary">
-                                                <span class="spinner envira-gallery-spinner"></span><input type="search" placeholder="<?php esc_attr_e( 'Search', 'envira-gallery' ); ?>" id="envira-gallery-gallery-search" class="search" value="" />
+                                                <input type="search" placeholder="<?php esc_attr_e( 'Search', 'envira-gallery' ); ?>" id="envira-gallery-gallery-search" class="search" value="" />
                                             </div>
                                             <div class="media-toolbar-secondary">
                                                 <a class="button media-button button-large button-secodary envira-gallery-load-library" href="#" data-envira-gallery-offset="20"><?php _e( 'Load More Images from Library', 'envira-gallery' ); ?></a></a><span class="spinner envira-gallery-spinner"></span>

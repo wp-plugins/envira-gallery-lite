@@ -108,76 +108,64 @@
                 $(this).parent().parent().addClass('details selected');
         });
 
-        // Load more images into the library view.
-        $('.envira-gallery-load-library').on('click', function(e){
-            e.preventDefault();
-            var $this = $(this);
-            $this.next().css({'display' : 'inline-block', 'margin-top' : '14px', 'margin-left' : '-5px'});
+        // Load more images into the library view when the 'Load More Images from Library'
+        // button is pressed
+        $(document).on('click', 'a.envira-gallery-load-library', function(e){
+            enviraLoadLibraryImages( $('a.envira-gallery-load-library').attr('data-envira-gallery-offset') );
+        });
 
-            // Prepare our data to be sent via Ajax.
-            var load = {
-                action:  'envira_gallery_load_library',
-                offset:  parseInt($this.attr('data-envira-gallery-offset')),
-                post_id: envira_gallery_metabox.id,
-                nonce:   envira_gallery_metabox.load_gallery
-            };
+        // Load more images into the library view when the user scrolls to the bottom of the view
+        // Honours any search term(s) specified
+        $('.envira-gallery-gallery').bind('scroll', function() {
+            if( $(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight ) {
+                enviraLoadLibraryImages( $('a.envira-gallery-load-library').attr('data-envira-gallery-offset') );
+            }
+        });
 
-            // Process the Ajax response and output all the necessary data.
+        // Load images when the search term changes
+        $(document).on('keyup keydown', '#envira-gallery-gallery-search', function() {
+            delay(function() {
+                enviraLoadLibraryImages( 0 );
+            }); 
+        });
+
+        /**
+        * Makes an AJAX call to get the next batch of images
+        */
+        function enviraLoadLibraryImages( offset ) {
+            // Show spinner
+            $('.media-toolbar-secondary span.envira-gallery-spinner').css('visibility','visible');
+
+            // AJAX call to get next batch of images
             $.post(
                 envira_gallery_metabox.ajax,
-                load,
+                {
+                    action:  'envira_gallery_load_library',
+                    offset:  offset,
+                    post_id: envira_gallery_metabox.id,
+                    search:  $('input#envira-gallery-gallery-search').val(),
+                    nonce:   envira_gallery_metabox.load_gallery
+                },
                 function(response) {
-                    $this.attr('data-envira-gallery-offset', parseInt($this.attr('data-envira-gallery-offset')) + 20);
+                    // Update offset
+                    $('a.envira-gallery-load-library').attr('data-envira-gallery-offset', ( Number(offset) + 20 ) );
+
+                    // Hide spinner
+                    $('.media-toolbar-secondary span.envira-gallery-spinner').css('visibility','hidden');
 
                     // Append the response data.
-                    if ( response && response.html && $this.hasClass('has-search') ) {
-                        $('.envira-gallery-gallery').html(response.html);
-                        $this.removeClass('has-search');
+                    if ( offset === 0 ) {
+                        // New search, so replace results
+                        $('.envira-gallery-gallery').html( response.html );    
                     } else {
-                        $('.envira-gallery-gallery').append(response.html);
+                        // Append to end of results
+                        $('.envira-gallery-gallery').append( response.html );
                     }
-
-                    // Remove the spinner.
-                    $this.next().hide();
+                    
                 },
                 'json'
             );
-        });
-
-        // Load images related to the search term specified
-        $(document).on('keyup keydown', '#envira-gallery-gallery-search', function(){
-            var $this = $(this);
-            $this.prev().css({'display' : 'inline-block', 'margin-top' : '1px', 'vertical-align' : 'middle', 'margin-right' : '4px'});
-
-            var text     = $(this).val();
-            var search   = {
-                action:  'envira_gallery_library_search',
-                nonce:   envira_gallery_metabox.library_search,
-                post_id: envira_gallery_metabox.id,
-                search:  text
-            };
-
-            // Send the ajax request with a delay (500ms after the user stops typing).
-            delay(function() {
-                // Process the Ajax response and output all the necessary data.
-                $.post(
-                    envira_gallery_metabox.ajax,
-                    search,
-                    function(response) {
-                        // Notify the load button that we have entered a search and reset the offset counter.
-                        $('.envira-load-library').addClass('has-search').attr('data-envira-offset', parseInt(0));
-
-                        // Append the response data.
-                        if ( response )
-                            $('.envira-gallery-gallery').html(response.html);
-
-                        // Remove the spinner.
-                        $this.prev().hide();
-                    },
-                    'json'
-                );
-            }, '500');
-        });
+        }
 
         // Process inserting slides into slider when the Insert button is pressed.
         $(document).on('click', '.envira-gallery-media-insert', function(e){

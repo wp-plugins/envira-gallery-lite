@@ -317,6 +317,18 @@ class Envira_Gallery_Shortcode_Lite {
                     },
                     beforeLoad: function(){
                         this.title = $(this.element).attr('title');
+                    },
+                    afterShow: function() {
+                        <?php
+                        // If title helper = float_wrap, add a CSS class so we can disable word-wrap
+                        if ( $this->get_config( 'title_display', $data ) == 'float_wrap' ) {
+                            ?>
+                            if ( ! $( 'div.envirabox-title' ).hasClass( 'envirabox-title-text-wrap' ) ) {
+                                $( 'div.envirabox-title' ).addClass( 'envirabox-title-text-wrap' );
+                            }
+                            <?php
+                        }
+                        ?>
                     }
                 });
 

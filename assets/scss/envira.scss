@@ -1,4 +1,4 @@
-/* ==========================================================================
+ /* ==========================================================================
    Envira Gallery Styles
    ========================================================================== */
    
@@ -418,6 +418,9 @@ a.envirabox-nav:hover {
     color: #FFF;
     line-height: 24px;
     white-space: nowrap;
+}
+.envirabox-title-float-wrap.envirabox-title-text-wrap .child {
+    white-space: normal;
 }
 
 .envirabox-title-outside-wrap {

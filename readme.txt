@@ -57,6 +57,9 @@ Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Develo
 
 == Changelog ==
 
+= 1.2.7 =
+* Added: Caption Position Float (Wrapped) option, to wrap Lightbox Caption text to match width of image.
+
 = 1.2.6 =
 * Added: Insert Images Modal automatically loads more images on scroll
 * Added: Insert Images Modal search functionality performance improved

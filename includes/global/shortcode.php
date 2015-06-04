@@ -365,6 +365,11 @@ class Envira_Gallery_Shortcode_Lite {
             $classes[] = $class;
         }
 
+        // If the gallery has RTL support, add a class for it.
+        if ( $this->get_config( 'rtl', $data ) ) {
+            $classes[] = 'envira-gallery-rtl';
+        }
+
         // Allow filtering of classes and then return what's left.
         $classes   = apply_filters( 'envira_gallery_output_classes', $classes, $data );
         return trim( implode( ' ', array_map( 'trim', array_map( 'sanitize_html_class', array_unique( $classes ) ) ) ) );

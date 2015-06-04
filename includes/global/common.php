@@ -191,7 +191,8 @@ class Envira_Gallery_Common_Lite {
             'loop'                => 1,
             'classes'             => array(),
             'title'               => '',
-            'slug'                => ''
+            'slug'                => '',
+            'rtl'                 => 0,
         );
 
         // Allow devs to filter the defaults.

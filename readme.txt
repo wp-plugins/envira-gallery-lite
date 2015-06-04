@@ -57,6 +57,9 @@ Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Develo
 
 == Changelog ==
 
+= 1.2.8 =
+* Added: RTL Support
+
 = 1.2.7 =
 * Added: Caption Position Float (Wrapped) option, to wrap Lightbox Caption text to match width of image.
 

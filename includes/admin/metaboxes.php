@@ -709,6 +709,15 @@ class Envira_Gallery_Metaboxes_Lite {
                             <p class="description"><?php _e( 'Adds custom CSS classes to this gallery. Enter one class per line.', 'envira-gallery' ); ?></p>
                         </td>
                     </tr>
+                    <tr id="envira-config-rtl-box">
+                        <th scope="row">
+                            <label for="envira-config-rtl"><?php _e( 'Enable RTL Support?', 'envira-gallery' ); ?></label>
+                        </th>
+                        <td>
+                            <input id="envira-config-rtl" type="checkbox" name="_envira_gallery[rtl]" value="<?php echo $this->get_config( 'rtl', $this->get_config_default( 'rtl' ) ); ?>" <?php checked( $this->get_config( 'rtl', $this->get_config_default( 'rtl' ) ), 1 ); ?> />
+                            <span class="description"><?php _e( 'Enables or disables RTL support in Envira for right-to-left languages.', 'envira-gallery' ); ?></span>
+                        </td>
+                    </tr>
                     <?php do_action( 'envira_gallery_misc_box', $post ); ?>
                 </tbody>
             </table>
@@ -784,6 +793,7 @@ class Envira_Gallery_Metaboxes_Lite {
         $settings['config']['title']        = trim( strip_tags( $_POST['_envira_gallery']['title'] ) );
         $settings['config']['slug']         = sanitize_text_field( $_POST['_envira_gallery']['slug'] );
         $settings['config']['title_display']= preg_replace( '#[^a-z0-9-_]#', '', $_POST['_envira_gallery']['title_display'] );
+        $settings['config']['rtl']          = isset( $_POST['_envira_gallery']['rtl'] ) ? 1 : 0;
 
         // If on an envira post type, map the title and slug of the post object to the custom fields if no value exists yet.
         if ( isset( $post->post_type ) && 'envira' == $post->post_type ) {

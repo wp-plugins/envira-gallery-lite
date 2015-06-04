@@ -75,7 +75,7 @@ class Envira_Gallery_Editor_Lite {
         $button .= '<a id="envira-media-modal-button" href="#" class="button envira-gallery-choose-gallery" title="' . esc_attr__( 'Add Gallery', 'envira-gallery' ) . '" style="padding-left: .4em;"><span class="envira-media-icon" style="background: transparent url(' . plugins_url( 'assets/css/images/menu-icon.png', $this->base->file ) . ') no-repeat scroll 0 0; width: 16px; height: 16px; display: inline-block; vertical-align: text-top;"></span> ' . __( 'Add Gallery', 'envira-gallery' ) . '</a>';
 
         // Enqueue the script that will trigger the editor button.
-        wp_enqueue_script( $this->base->plugin_slug . '-editor-script', plugins_url( 'assets/js/editor.js', $this->base->file ), array( 'jquery' ), $this->base->version, true );
+        wp_enqueue_script( $this->base->plugin_slug . '-editor-script', plugins_url( 'assets/js/min/editor-min.js', $this->base->file ), array( 'jquery' ), $this->base->version, true );
 
         // Add the action to the footer to output the modal window.
         add_action( 'admin_footer', array( $this, 'gallery_selection_modal' ) );
@@ -135,7 +135,7 @@ class Envira_Gallery_Editor_Lite {
                                         <li class="attachment" data-envira-gallery-id="<?php echo absint( $post->ID ); ?>" style="margin: 8px;">
                                             <div class="attachment-preview landscape">
                                                 <div class="thumbnail" style="display: table;">
-                                                    <div style="display: table-cell; vertical-align: middle; text-align: center;">
+                                                    <div class="inside">
                                                         <h3 style="margin: 0;color: #7ad03a;"><?php _e( 'This Post\'s Gallery', 'envira-gallery' ); ?></h3>
                                                         <code style="color: #7ad03a;">[envira-gallery id="<?php echo absint( $post->ID ); ?>"]</code>
                                                     </div>
@@ -143,11 +143,12 @@ class Envira_Gallery_Editor_Lite {
                                                 <a class="check" href="#"><div class="media-modal-icon"></div></a>
                                             </div>
                                         </li>
+
                                         <?php foreach ( (array) $galleries as $gallery ) : if ( $post->ID == $gallery['id'] ) continue; ?>
                                         <li class="attachment" data-envira-gallery-id="<?php echo absint( $gallery['id'] ); ?>" style="margin: 8px;">
                                             <div class="attachment-preview landscape">
                                                 <div class="thumbnail" style="display: table;">
-                                                    <div style="display: table-cell; vertical-align: middle; text-align: center;">
+                                                    <div class="inside">
                                                         <?php
                                                         if ( ! empty( $gallery['config']['title'] ) ) {
                                                             $title = $gallery['config']['title'];

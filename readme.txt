@@ -57,6 +57,9 @@ Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Develo
 
 == Changelog ==
 
+= 1.2.9 =
+* Added: envira_minify_strip_double_forward_slashes filter when minifying, allowing developers to disable this for edge cases
+
 = 1.2.8 =
 * Added: RTL Support
 

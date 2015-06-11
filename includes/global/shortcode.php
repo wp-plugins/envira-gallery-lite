@@ -483,9 +483,10 @@ class Envira_Gallery_Shortcode_Lite {
     public function minify( $string, $stripDoubleForwardslashes = true ) {
 
 	    // Added a switch for stripping double forwardslashes
-	    // This can be disabled when using URLs in JS, to ensure http:// doesn't get removed
-		// All other comment removal and minification will take place
-	    
+        // This can be disabled when using URLs in JS, to ensure http:// doesn't get removed
+        // All other comment removal and minification will take place
+        $stripDoubleForwardslashes = apply_filters( 'envira_minify_strip_double_forward_slashes', $stripDoubleForwardslashes );
+         
 		if ( $stripDoubleForwardslashes ) {
 	    	$clean = preg_replace( '/((?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:\/\/.*))/', '', $string );
 	    } else {

@@ -222,7 +222,12 @@ function envira_gallery_lite_ajax_sort_images() {
     $order        = explode( ',', $_POST['order'] );
     $post_id      = absint( $_POST['post_id'] );
     $gallery_data = get_post_meta( $post_id, '_eg_gallery_data', true );
-    $new_order    = array();
+    
+    // Copy the gallery config, removing the images
+    // Stops config from getting lost when sorting + not clicking Publish/Update
+    $new_order = $gallery_data;
+    unset( $new_order['gallery'] );
+    $new_order['gallery'] = array();
 
     // Loop through the order and generate a new array based on order received.
     foreach ( $order as $id ) {

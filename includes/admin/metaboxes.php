@@ -777,10 +777,9 @@ class Envira_Gallery_Metaboxes_Lite {
             $settings = array();
         }
 
-        // If the ID of the gallery is not set or is lost, replace it now.
-        if ( empty( $settings['id'] ) || ! $settings['id'] ) {
-            $settings['id'] = $post_id;
-        }
+        // Force gallery ID to match Post ID. This is deliberate; if a gallery is duplicated (either using a duplication)
+        // plugin or WPML, the ID remains as the original gallery ID, which breaks things for translations etc.
+        $settings['id'] = $post_id;
 
         // Save the config settings.
         $settings['config']['columns']      = preg_replace( '#[^a-z0-9-_]#', '', $_POST['_envira_gallery']['columns'] );

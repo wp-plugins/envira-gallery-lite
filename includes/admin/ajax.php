@@ -83,11 +83,26 @@ function envira_gallery_lite_ajax_load_library() {
 
     // Prepare variables.
     $offset  = (int) $_POST['offset'];
+    $search  = trim( stripslashes( $_POST['search'] ) );
     $post_id = absint( $_POST['post_id'] );
     $html    = '';
 
-    // Grab the library contents with the included offset parameter.
-    $library = get_posts( array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'post_status' => 'any', 'posts_per_page' => 20, 'offset' => $offset ) );
+    // Build args
+    $args = array(
+        'post_type'     => 'attachment', 
+        'post_mime_type'=> 'image', 
+        'post_status'   => 'any', 
+        'posts_per_page'=> 20, 
+        'offset'        => $offset,
+    );
+
+    // Add search term to args if not empty
+    if ( ! empty( $search ) ) {
+        $args['s'] = $search;
+    }
+
+    // Grab the library contents
+    $library = get_posts( $args );
     if ( $library ) {
         foreach ( (array) $library as $image ) {
             $has_gallery = get_post_meta( $image->ID, '_eg_has_gallery', true );
@@ -117,39 +132,14 @@ add_action( 'wp_ajax_envira_gallery_library_search', 'envira_gallery_lite_ajax_l
  * Searches the Media Library for images matching the term specified in the search.
  *
  * @since 1.0.0
+ * @deprecated 1.2.6
  */
 function envira_gallery_lite_ajax_library_search() {
 
-    // Run a security check first.
-    check_ajax_referer( 'envira-gallery-library-search', 'nonce' );
-
-    // Prepare variables.
-    $search  = stripslashes( $_POST['search'] );
-    $post_id = absint( $_POST['post_id'] );
-    $html    = '';
-
-    // Grab the library contents with the included offset parameter.
-    $library = get_posts( array( 'post_type' => 'attachment', 'post_mime_type' => 'image', 'post_status' => 'any', 'posts_per_page' => -1, 's' => $search ) );
-    if ( $library ) {
-        foreach ( (array) $library as $image ) {
-            $has_gallery = get_post_meta( $image->ID, '_eg_has_gallery', true );
-            $class       = $has_gallery && in_array( $post_id, (array) $has_gallery ) ? ' selected envira-gallery-in-gallery' : '';
-
-            $html .= '<li class="attachment' . $class . '" data-attachment-id="' . absint( $image->ID ) . '">';
-                $html .= '<div class="attachment-preview landscape">';
-                    $html .= '<div class="thumbnail">';
-                        $html .= '<div class="centered">';
-                            $src = wp_get_attachment_image_src( $image->ID, 'thumbnail' );
-                            $html .= '<img src="' . esc_url( $src[0] ) . '" />';
-                        $html .= '</div>';
-                    $html .= '</div>';
-                    $html .= '<a class="check" href="#"><div class="media-modal-icon"></div></a>';
-                $html .= '</div>';
-            $html .= '</li>';
-        }
-    }
-
-    echo json_encode( array( 'html' => stripslashes( $html ) ) );
+    // Search is now performed by envira_gallery_lite_ajax_load_library()
+    // Return the result of that function, so addons and custom code relying on this action
+    // doesn't break
+    envira_gallery_lite_ajax_load_library();
     die;
 
 }
@@ -232,7 +222,12 @@ function envira_gallery_lite_ajax_sort_images() {
     $order        = explode( ',', $_POST['order'] );
     $post_id      = absint( $_POST['post_id'] );
     $gallery_data = get_post_meta( $post_id, '_eg_gallery_data', true );
-    $new_order    = array();
+    
+    // Copy the gallery config, removing the images
+    // Stops config from getting lost when sorting + not clicking Publish/Update
+    $new_order = $gallery_data;
+    unset( $new_order['gallery'] );
+    $new_order['gallery'] = array();
 
     // Loop through the order and generate a new array based on order received.
     foreach ( $order as $id ) {

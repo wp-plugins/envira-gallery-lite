@@ -576,6 +576,7 @@ class Envira_Gallery_Metaboxes_Lite {
                         </th>
                         <td>
                             <input id="envira-config-gutter" type="number" name="_envira_gallery[gutter]" value="<?php echo $this->get_config( 'gutter', $this->get_config_default( 'gutter' ) ); ?>" />
+                            <span class="envira-unit"><?php _e( 'px', 'envira-gallery' ); ?></span>
                             <p class="description"><?php _e( 'Sets the space between the columns (defaults to 10).', 'envira-gallery' ); ?></p>
                         </td>
                     </tr>
@@ -585,6 +586,7 @@ class Envira_Gallery_Metaboxes_Lite {
                         </th>
                         <td>
                             <input id="envira-config-margin" type="number" name="_envira_gallery[margin]" value="<?php echo $this->get_config( 'margin', $this->get_config_default( 'margin' ) ); ?>" />
+                            <span class="envira-unit"><?php _e( 'px', 'envira-gallery' ); ?></span>
                             <p class="description"><?php _e( 'Sets the space below each item in the gallery.', 'envira-gallery' ); ?></p>
                         </td>
                     </tr>

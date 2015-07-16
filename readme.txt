@@ -57,6 +57,9 @@ Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Develo
 
 == Changelog ==
 
+= 1.3.2 =
+* Added: Units label to Column Gutter Width and Margin Below Each Image settings
+
 = 1.3.1 =
 * Fix: Force gallery ID on save, to ensure compat with WPML and duplication plugins
 

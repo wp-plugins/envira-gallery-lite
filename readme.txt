@@ -2,7 +2,7 @@
 Contributors: griffinjt
 Tags: wordpress gallery, gallery, wordpress gallery plugin, gallery plugin, responsive, responsive gallery, image gallery, image gallery plugin, responsive gallery plugin, responsive image gallery, responsive image gallery plugin, custom post types, slideshow, responsive slideshow, slideshow plugin, responsive slideshow plugin, rotator, image rotator, responsive rotator, jquery gallery, javascript gallery, jquery rotator, javascript rotator, picture gallery, photo gallery, photo rotator, shortcode, template tag, custom post type, media uploader, ajax, wordpress galleries, responsive galleries, fullscreen, deeplinking, best wordpress gallery, best wordpress gallery plugin, best gallery plugin, best gallery, best responsive gallery, best responsive wordpress gallery, best wp gallery
 Requires at least: 3.8
-Tested up to: 3.9
+Tested up to: 4.3
 Stable tag: trunk
 License: GNU General Public License v2.0 or later
 
@@ -56,6 +56,76 @@ Envira Gallery is absolutely, positively the <a href="http://enviragallery.com/?
 Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Developer - Thomas Griffin">expert WordPress developer</a> and I write a lot about WordPress in general. You can check out my blog at the link above.
 
 == Changelog ==
+
+= 1.3.2 =
+* Added: Units label to Column Gutter Width and Margin Below Each Image settings
+
+= 1.3.1 =
+* Fix: Force gallery ID on save, to ensure compat with WPML and duplication plugins
+
+= 1.3.0 =
+* Fix: Sorting images in a gallery and not clicking Update would result in loss of gallery configuration
+
+= 1.2.9 =
+* Added: envira_minify_strip_double_forward_slashes filter when minifying, allowing developers to disable this for edge cases
+
+= 1.2.8 =
+* Added: RTL Support
+
+= 1.2.7 =
+* Added: Caption Position Float (Wrapped) option, to wrap Lightbox Caption text to match width of image.
+
+= 1.2.6 =
+* Added: Insert Images Modal automatically loads more images on scroll
+* Added: Insert Images Modal search functionality performance improved
+* Fix: Better Insert Images Modal image grid layout for WordPress 4.0+ 
+
+= 1.2.5 =
+* Added: WordPress 4.2.1 support
+
+= 1.2.4 =
+* Fix: This Post's Gallery was missing when using the Add Gallery button
+
+= 1.2.3 =
+* Added: Mobile - lightbox arrows remain displayed on touchscreen devices, so it is clearer to the user how they can navigate through the images
+
+= 1.2.2 =
+* Fix: Image title link color changed to stand out from image title background color in Lightbox
+
+= 1.2.1 =
+* Fix: Loading localization language files for some installations
+
+= 1.2.0 =
+* Added: .POT file for translation / localization support
+
+= 1.1.9 =
+* Added: Minified editor JS
+
+= 1.1.8 =
+* Added: CSS minification for Administration CSS
+
+= 1.1.7 =
+* Fix: Minification of inline CSS and JS
+* Fix: Alt tags on images
+* Fix: Links on Lightbox Image Titles
+
+= 1.1.6 =
+* Fix: Upgraded Fancybox to 2.1.5
+* Fix: Improved error message UI when uploading files exceeding WordPress / PHP file size limits
+
+= 1.1.5 =
+* Fix: Metadata - close window would not always work after uploading new images
+* Fix: Support single quotation character in Image Title
+
+= 1.1.4 =
+* Added: Metadata - Image Alt Text Helpful Tip
+* Fix: Metadata - wp_editor too large for smaller screen resolutions
+
+= 1.1.3 =
+* Fix: Enable HTML captions
+
+= 1.1.2 =
+* Fix: WordPress 4.0 support for Add Slider attachment window
 
 = 1.1.1 =
 * Compatibility updates with WordPress 4.1.

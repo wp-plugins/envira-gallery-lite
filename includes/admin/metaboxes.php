@@ -633,6 +633,15 @@ class Envira_Gallery_Metaboxes_Lite {
             <p class="envira-intro"><?php _e( 'The settings below adjust the lightbox outputs and displays.', 'envira-gallery' ); ?></p>
             <table class="form-table">
                 <tbody>
+                    <tr id="envira-config-lightbox-enabled-box">
+                        <th scope="row">
+                            <label for="envira-config-lightbox-enabled"><?php _e( 'Enable Lightbox?', 'envira-gallery' ); ?></label>
+                        </th>
+                        <td>
+                            <input id="envira-config-lightbox-enabled" type="checkbox" name="_envira_gallery[lightbox_enabled]" value="<?php echo $this->get_config( 'lightbox_enabled', $this->get_config_default( 'lightbox_enabled' ) ); ?>" <?php checked( $this->get_config( 'lightbox_enabled', $this->get_config_default( 'lightbox_enabled' ) ), 1 ); ?> />
+                            <span class="description"><?php _e( 'Enables or disables the gallery lightbox.', 'envira-gallery' ); ?></span>
+                        </td>
+                    </tr>
                     <tr id="envira-config-lightbox-theme-box">
                         <th scope="row">
                             <label for="envira-config-lightbox-theme"><?php _e( 'Gallery Lightbox Theme', 'envira-gallery' ); ?></label>
@@ -790,10 +799,15 @@ class Envira_Gallery_Metaboxes_Lite {
         $settings['config']['crop']         = isset( $_POST['_envira_gallery']['crop'] ) ? 1 : 0;
         $settings['config']['crop_width']   = absint( $_POST['_envira_gallery']['crop_width'] );
         $settings['config']['crop_height']  = absint( $_POST['_envira_gallery']['crop_height'] );
+        
+        // Lightbox
+        $settings['config']['lightbox_enabled'] = isset( $_POST['_envira_gallery']['lightbox_enabled'] ) ? 1 : 0;
+        $settings['config']['title_display']    = preg_replace( '#[^a-z0-9-_]#', '', $_POST['_envira_gallery']['title_display'] );
+
+        // Misc
         $settings['config']['classes']      = explode( "\n", $_POST['_envira_gallery']['classes'] );
         $settings['config']['title']        = trim( strip_tags( $_POST['_envira_gallery']['title'] ) );
         $settings['config']['slug']         = sanitize_text_field( $_POST['_envira_gallery']['slug'] );
-        $settings['config']['title_display']= preg_replace( '#[^a-z0-9-_]#', '', $_POST['_envira_gallery']['title_display'] );
         $settings['config']['rtl']          = isset( $_POST['_envira_gallery']['rtl'] ) ? 1 : 0;
 
         // If on an envira post type, map the title and slug of the post object to the custom fields if no value exists yet.

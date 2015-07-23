@@ -182,6 +182,7 @@ class Envira_Gallery_Common_Lite {
             'crop'                => 0,
             'crop_width'          => 960,
             'crop_height'         => 300,
+            'lightbox_enabled'    => 1,
             'arrows'              => 1,
             'keyboard'            => 1,
             'mousewheel'          => 1,

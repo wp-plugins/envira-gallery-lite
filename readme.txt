@@ -57,6 +57,9 @@ Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Develo
 
 == Changelog ==
 
+= 1.3.3 =
+* Added: Enable/disable Lightbox option
+
 = 1.3.2 =
 * Added: Units label to Column Gutter Width and Margin Below Each Image settings
 

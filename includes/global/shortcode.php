@@ -290,49 +290,56 @@ class Envira_Gallery_Shortcode_Lite {
                 <?php do_action( 'envira_gallery_api_isotope', $data ); // Deprecated. ?>
                 <?php do_action( 'envira_gallery_api_enviratope', $data ); ?>
 
-                $('.envira-gallery-<?php echo $data['id']; ?>').envirabox({
-                    <?php do_action( 'envira_gallery_api_config', $data ); ?>
-                    cyclic: true,
-                    centerOnScroll: true,
-                    <?php do_action( 'envira_gallery_api_config_callback', $data ); ?>
-                    onStart: function(data, index, opts){
-                        $(window).on({
-                            'resize' : function(){
-                                $.envirabox.resize();
-                                $.envirabox.center();
+                <?php
+                // Fancybox: Start
+                if ( $this->get_config( 'lightbox_enabled', $data ) ) {
+                    ?>
+                    $('.envira-gallery-<?php echo $data['id']; ?>').envirabox({
+                        <?php do_action( 'envira_gallery_api_config', $data ); ?>
+                        cyclic: true,
+                        centerOnScroll: true,
+                        <?php do_action( 'envira_gallery_api_config_callback', $data ); ?>
+                        onStart: function(data, index, opts){
+                            $(window).on({
+                                'resize' : function(){
+                                    $.envirabox.resize();
+                                    $.envirabox.center();
+                                }
+                            });
+
+                            var obj  = data[index],
+                                href = opts.href || (obj.nodeName ? $(obj).attr('href') : obj.href) || null;
+
+                            if ((/^(?:javascript)/i).test(href) || href == '#') {
+                                href = null;
                             }
-                        });
 
-                        var obj  = data[index],
-                            href = opts.href || (obj.nodeName ? $(obj).attr('href') : obj.href) || null;
-
-                        if ((/^(?:javascript)/i).test(href) || href == '#') {
-                            href = null;
-                        }
-
-                        if ( href && ! href.match(/\.(jpg|gif|png|bmp|jpeg)(.*)?$/i) ) {
-                            window.location.href = href;
-                            return false;
-                        }
-                    },
-                    beforeLoad: function(){
-                        this.title = $(this.element).attr('title');
-                    },
-                    afterShow: function() {
-                        <?php
-                        // If title helper = float_wrap, add a CSS class so we can disable word-wrap
-                        if ( $this->get_config( 'title_display', $data ) == 'float_wrap' ) {
-                            ?>
-                            if ( ! $( 'div.envirabox-title' ).hasClass( 'envirabox-title-text-wrap' ) ) {
-                                $( 'div.envirabox-title' ).addClass( 'envirabox-title-text-wrap' );
+                            if ( href && ! href.match(/\.(jpg|gif|png|bmp|jpeg)(.*)?$/i) ) {
+                                window.location.href = href;
+                                return false;
                             }
+                        },
+                        beforeLoad: function(){
+                            this.title = $(this.element).attr('title');
+                        },
+                        afterShow: function() {
                             <?php
+                            // If title helper = float_wrap, add a CSS class so we can disable word-wrap
+                            if ( $this->get_config( 'title_display', $data ) == 'float_wrap' ) {
+                                ?>
+                                if ( ! $( 'div.envirabox-title' ).hasClass( 'envirabox-title-text-wrap' ) ) {
+                                    $( 'div.envirabox-title' ).addClass( 'envirabox-title-text-wrap' );
+                                }
+                                <?php
+                            }
+                            ?>
                         }
-                        ?>
-                    }
-                });
+                    });
+                    <?php 
+                    do_action( 'envira_gallery_api_lightbox', $data ); 
+                } // Fancybox: End
+                ?>
 
-                <?php do_action( 'envira_gallery_api_lightbox', $data ); ?>
             <?php do_action( 'envira_gallery_api_end', $data ); endforeach;
 
             // Minify before outputting to improve page load time.

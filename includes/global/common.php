@@ -131,6 +131,30 @@ class Envira_Gallery_Common_Lite {
     }
 
     /**
+     * Helper method for retrieving title displays.
+     *
+     * @since 1.2.7
+     *
+     * @return array Array of title display data.
+     */
+    public function get_title_displays() {
+
+        $displays = array(
+            array(
+                'value' => 'float',
+                'name'  => __( 'Float', 'envira-gallery' )
+            ),
+            array(
+                'value' => 'float_wrap',
+                'name'  => __( 'Float (Wrapped)', 'envira-gallery' )
+            ),
+        );
+
+        return apply_filters( 'envira_gallery_title_displays', $displays );
+
+    }
+
+    /**
      * Helper method for setting default config values.
      *
      * @since 1.0.0
@@ -152,11 +176,13 @@ class Envira_Gallery_Common_Lite {
             'columns'             => '1',
             'gallery_theme'       => 'base',
             'lightbox_theme'      => 'base',
+            'title_display'       => 'float',
             'gutter'              => 10,
             'margin'              => 10,
             'crop'                => 0,
             'crop_width'          => 960,
             'crop_height'         => 300,
+            'lightbox_enabled'    => 1,
             'arrows'              => 1,
             'keyboard'            => 1,
             'mousewheel'          => 1,
@@ -166,7 +192,8 @@ class Envira_Gallery_Common_Lite {
             'loop'                => 1,
             'classes'             => array(),
             'title'               => '',
-            'slug'                => ''
+            'slug'                => '',
+            'rtl'                 => 0,
         );
 
         // Allow devs to filter the defaults.

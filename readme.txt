@@ -57,6 +57,9 @@ Also, I'm an <a href="https://thomasgriffin.io" rel="me" title="WordPress Develo
 
 == Changelog ==
 
+= 1.3.4 =
+* Fix: Removed console.log entry in JS which would have caused image upload issues in legacy IE browsers
+
 = 1.3.3 =
 * Added: Enable/disable Lightbox option
 

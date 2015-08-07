@@ -623,8 +623,6 @@
         function enviraUploadError( up, file, over100mb ) {
             var message;
 
-            console.log('enviraUploadError');
-
             if ( over100mb ) {
                 message = pluploadL10n.big_upload_queued.replace('%s', file.name) + ' ' + pluploadL10n.big_upload_failed.replace('%1$s', '<a class="uploader-html" href="#">').replace('%2$s', '</a>');
             } else {

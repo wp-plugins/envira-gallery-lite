@@ -587,6 +587,28 @@
 }
 
 /* ==========================================================================
+   Modal
+   4.3: Close links are replaced by buttons, which break styling on our close links - so we style our links in 4.3+
+   ========================================================================== */
+body.branch-4-3 {
+    div.media-modal {
+        /**
+        * Close Button
+        */
+        a.media-modal-close {
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+
+            span {
+                display: inline-block;
+                margin-top: 17px;
+            }
+        }
+    }
+}
+
+/* ==========================================================================
    Attachment Editor
    ========================================================================== */
 
